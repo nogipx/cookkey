@@ -15,7 +15,10 @@
       "name": "Run Backend",
       "type": "dart",
       "request": "launch",
-      "program": "backend/lib/main.dart"
+      "program": "backend/lib/main.dart",
+      "vmAdditionalArgs": [
+        "--enable-vm-service"
+      ]
     },
     
   ]

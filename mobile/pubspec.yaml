@@ -1,0 +1,37 @@
+name: cookkey
+description: A new Flutter project.
+version: 1.0.0+1
+publish_to: "none"
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  bloc: ^6.0.3
+  flutter_bloc: ^6.0.5
+  convenient_bloc:
+    path: ../packages/convenient_bloc
+  domain:
+    path: ../domain
+
+  uuid: ^2.2.0
+  equatable: ^1.0.0
+  json_annotation: ^3.1.0
+  json_serializable: ^3.5.0
+
+  cupertino_icons: ^1.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  pedantic: ^1.9.0
+  bloc_test: ^7.0.4
+  mockito: ^4.1.1
+  build_runner: ^1.10.3
+
+
+flutter:
+  uses-material-design: true

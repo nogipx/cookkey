@@ -1,3 +1,4 @@
+import 'package:domain/domain.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
@@ -113,7 +114,5 @@ enum IngredientMeasure {
   Gram,
   Liter,
 }
-
-class User {}
 
 class FoodImage {}

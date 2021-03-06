@@ -1,4 +1,4 @@
-import 'package:cookkey/ui/screen/test_page.dart';
+import 'package:cookkey/screen/test_page.dart';
 import 'package:flutter/material.dart';
 
 class CookkeyMobileApp extends StatelessWidget {

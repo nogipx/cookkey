@@ -1,4 +1,4 @@
-import 'package:domain/domain.dart';
+import 'package:sdk/domain.dart';
 
 abstract class RecipeService {
   Future<List<Recipe>> getMyRecipes();

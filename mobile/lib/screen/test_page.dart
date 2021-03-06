@@ -1,5 +1,4 @@
-import 'package:domain/domain.dart';
-import 'package:cookkey/service/export.dart';
+import 'package:sdk/sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

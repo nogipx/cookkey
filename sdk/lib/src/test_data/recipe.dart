@@ -1,5 +1,5 @@
 import 'package:uuid/uuid.dart';
-import 'package:domain/domain.dart';
+import 'package:sdk/sdk.dart';
 
 String get randomId => Uuid().v4();
 

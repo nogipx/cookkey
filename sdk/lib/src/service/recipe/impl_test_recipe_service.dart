@@ -1,7 +1,6 @@
 import 'dart:math';
-import 'package:domain/domain.dart';
-
-import 'package:cookkey/service/recipe/recipe_service.dart';
+import 'package:sdk/sdk.dart';
+import 'package:sdk/test_data.dart';
 
 class TestRecipeServiceImpl implements RecipeService {
   @override

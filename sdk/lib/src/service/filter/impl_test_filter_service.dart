@@ -1,6 +1,5 @@
-import 'package:domain/domain.dart';
-
-import 'package:cookkey/service/filter/filter_service.dart';
+import 'package:sdk/sdk.dart';
+import 'package:sdk/test_data.dart';
 
 class TestFilterServiceImpl implements FilterService {
   @override

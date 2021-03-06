@@ -14,8 +14,8 @@ dependencies:
   flutter_bloc: ^6.0.5
   convenient_bloc:
     path: ../packages/convenient_bloc
-  domain:
-    path: ../domain
+  sdk:
+    path: ../sdk
 
   uuid: ^2.2.0
   equatable: ^1.0.0

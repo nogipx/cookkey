@@ -1,8 +1,7 @@
+import 'package:backend/module/user/repo/export.dart';
 import 'package:sdk/domain.dart';
 
-import 'user_service.dart';
-
-class ImplTestUserService implements UserService {
+class ImplTestUserRepo implements UserRepo {
   @override
   Future<User> getUser(String id) async {
     final users = [

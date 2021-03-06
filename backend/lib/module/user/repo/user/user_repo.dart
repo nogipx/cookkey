@@ -1,6 +1,6 @@
 import 'package:sdk/domain.dart';
 
-abstract class UserService {
+abstract class UserRepo {
   Future<User> getUser(String id);
 
   Future<User> findUserByCredentials({

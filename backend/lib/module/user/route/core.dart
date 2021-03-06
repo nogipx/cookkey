@@ -3,13 +3,13 @@ import 'dart:developer';
 import 'package:angel_auth/angel_auth.dart';
 import 'package:angel_framework/angel_framework.dart';
 import 'package:angel_validate/angel_validate.dart';
-import 'package:backend/module/user/service/export.dart';
+import 'package:backend/module/user/repo/export.dart';
 import 'package:sdk/domain.dart';
 import 'package:meta/meta.dart';
 
 Future<void> configureUserModule({
   @required Angel app,
-  @required UserService userService,
+  @required UserRepo userService,
 }) async {
   app.get("user/:id", (req, res) async {
     await requireAuthentication<User>().call(req, res);

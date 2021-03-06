@@ -21,7 +21,7 @@ Future<void> main() async {
 Future<Angel> createServer() async {
   final app = Angel();
 
-  final UserService userService = ImplTestUserService();
+  final UserRepo userService = ImplTestUserRepo();
 
   final auth = await configureAuth(
     app: app,

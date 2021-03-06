@@ -9,7 +9,7 @@ import 'package:meta/meta.dart';
 
 Future<AngelAuth> configureAuth({
   @required Angel app,
-  @required UserService userService,
+  @required UserRepo userService,
 }) async {
   final auth = AngelAuth<User>(
     jwtKey: jwtKey,

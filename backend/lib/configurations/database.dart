@@ -6,5 +6,6 @@ Future<Db> configureDatabase({Angel app}) async {
     "mongodb+srv://nogipx:D916YsuhHrIAl4Lt@nogipx-mongo-cluster.bgkud.mongodb.net/cookkey_prod",
   );
   await db.open();
+  app.container.registerSingleton<Db>(db);
   return db;
 }

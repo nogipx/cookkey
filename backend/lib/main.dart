@@ -8,21 +8,36 @@ import 'package:angel_hot/angel_hot.dart';
 import 'package:backend/configurations/auth.dart';
 import 'package:backend/configurations/database.dart';
 import 'package:backend/configurations/error.dart';
+import 'package:backend/configurations/log.dart';
 import 'package:backend/module/user/controller/user_controller.dart';
+import 'package:logging/logging.dart';
 
 import 'module/user/export.dart';
 
 Future<void> main() async {
-  final hot = HotReloader(createServer, <dynamic>[
-    Directory('lib/'),
-    Uri.parse('package:angel_hot/angel_hot.dart'),
-  ]);
+  final logger = Logger("APP");
+  final hot = HotReloader(
+    () => createServer(logger: logger),
+    <dynamic>[
+      Directory('lib/'),
+      Uri.parse('package:angel_hot/angel_hot.dart'),
+    ],
+  );
+
+  hot.onChange.listen((event) {
+    logger.clearListeners();
+  });
+
   await hot.startServer('0.0.0.0', 3000);
   // print('Listening at ${hot}');
 }
 
-Future<Angel> createServer() async {
+Future<Angel> createServer({Logger logger}) async {
   final app = Angel(reflector: MirrorsReflector());
+  if (logger != null) {
+    await configureLogging(app: app, logger: logger);
+  }
+
   final db = await configureDatabase(app: app);
 
   final UserRepo userRepo = ImplMongoUserRepo(mongo: db);

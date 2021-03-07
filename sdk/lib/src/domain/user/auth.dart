@@ -17,6 +17,7 @@ class Auth {
 }
 
 @JsonSerializable()
+// ignore: must_be_immutable
 class AuthCredentials extends Equatable {
   final String username;
   final String password;

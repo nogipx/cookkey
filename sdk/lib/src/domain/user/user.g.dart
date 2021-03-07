@@ -21,3 +21,19 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'username': instance.username,
       'email': instance.email,
     };
+
+UserPermission _$UserPermissionFromJson(Map<String, dynamic> json) {
+  return UserPermission(
+    id: json['id'] as String,
+    level: json['level'] as int,
+    description: json['description'] as String,
+    translationKey: json['translationKey'] as String,
+  );
+}
+
+Map<String, dynamic> _$UserPermissionToJson(UserPermission instance) => <String, dynamic>{
+      'id': instance.id,
+      'level': instance.level,
+      'description': instance.description,
+      'translationKey': instance.translationKey,
+    };

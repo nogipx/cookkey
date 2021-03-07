@@ -11,7 +11,6 @@ ApiError _$ApiErrorFromJson(Map<String, dynamic> json) {
     statusCode: json['statusCode'] as int,
     message: json['message'] as String,
     translationKey: json['translationKey'] as String,
-    isError: json['isError'] as bool,
   );
 }
 
@@ -19,5 +18,4 @@ Map<String, dynamic> _$ApiErrorToJson(ApiError instance) => <String, dynamic>{
       'statusCode': instance.statusCode,
       'message': instance.message,
       'translationKey': instance.translationKey,
-      'isError': instance.isError,
     };

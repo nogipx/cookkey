@@ -6,7 +6,6 @@ part 'api_error.g.dart';
 
 @JsonSerializable()
 class ApiError extends Equatable {
-  final bool isError;
   final int statusCode;
   final String message;
   final String translationKey;
@@ -15,7 +14,6 @@ class ApiError extends Equatable {
     @required this.statusCode,
     @required this.message,
     this.translationKey,
-    this.isError = true,
   });
 
   @override

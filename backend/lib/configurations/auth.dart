@@ -9,7 +9,7 @@ import 'package:meta/meta.dart';
 
 Future<AngelAuth> configureAuth({
   @required Angel app,
-  @required UserRepo userService,
+  @required UserRepo userRepo,
 }) async {
   final auth = AngelAuth<User>(
     jwtKey: jwtKey,
@@ -17,24 +17,13 @@ Future<AngelAuth> configureAuth({
   );
 
   auth.serializer = (user) async => user.id;
-  auth.deserializer = (id) async => await userService.getUser(id as String);
+  auth.deserializer = (id) async => await userRepo.getUserById(id as String);
 
   auth.strategies['local'] = LocalAuthStrategy((username, password) async {
-    return await userService.findUserByCredentials(
+    return await userRepo.findUserByCredentials(
       username: username,
       hashPassword: password,
     );
-  });
-
-  app.post('/auth/local', (req, res) {
-    res.serializer = (dynamic value) {
-      final data = value as Map<String, dynamic>;
-      return jsonEncode(Auth(
-        user: data["data"] as User,
-        token: data["token"] as String,
-      ).toJson());
-    };
-    return auth.authenticate("local");
   });
 
   await auth.configureServer(app);

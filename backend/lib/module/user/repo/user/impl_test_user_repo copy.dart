@@ -1,9 +1,9 @@
 import 'package:backend/module/user/repo/export.dart';
 import 'package:sdk/domain.dart';
 
-class ImplTestUserRepo implements UserRepo {
+class ImplMongoUserRepo implements UserRepo {
   @override
-  Future<User> getUser(String id) async {
+  Future<User> getUserById(String id) async {
     final users = [
       User(id: "qwfpgj", name: "test1"),
       User(id: "arstdh", name: "test2"),

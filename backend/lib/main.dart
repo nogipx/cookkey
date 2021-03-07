@@ -3,9 +3,12 @@ library backend;
 import 'dart:io';
 
 import 'package:angel_framework/angel_framework.dart';
+import 'package:angel_container/mirrors.dart';
 import 'package:angel_hot/angel_hot.dart';
 import 'package:backend/configurations/auth.dart';
+import 'package:backend/configurations/database.dart';
 import 'package:backend/configurations/error.dart';
+import 'package:backend/module/user/controller/user_controller.dart';
 
 import 'module/user/export.dart';
 
@@ -19,20 +22,19 @@ Future<void> main() async {
 }
 
 Future<Angel> createServer() async {
-  final app = Angel();
+  final app = Angel(reflector: MirrorsReflector());
+  final db = await configureDatabase(app: app);
 
-  final UserRepo userService = ImplTestUserRepo();
+  final UserRepo userRepo = ImplMongoUserRepo(mongo: db);
 
-  final auth = await configureAuth(
-    app: app,
-    userService: userService,
-  );
-  app.container.registerNamedSingleton("auth", auth);
+  final auth = await configureAuth(app: app, userRepo: userRepo);
 
-  await configureUserModule(
-    app: app,
-    userService: userService,
-  );
+  final controllers = [
+    AuthController(auth: auth),
+    UserController(userRepo: userRepo),
+  ];
+
+  controllers.forEach((e) async => e.configureServer(app));
 
   await configureError(app);
   return app;

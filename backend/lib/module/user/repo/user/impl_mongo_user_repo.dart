@@ -8,21 +8,53 @@ class ImplMongoUserRepo implements UserRepo {
 
   ImplMongoUserRepo({@required this.mongo});
 
-  static const collection = "user";
+  static const userCollection = "user";
 
   @override
   Future<User> getUserById(String id) async {
-    final json = await mongo.collection(collection).findOne(where.eq("id", id));
-    final user = User.fromJson(json);
-    return user;
+    final json = await mongo.collection(userCollection).findOne(where.eq("id", id));
+    if (json != null) {
+      return User.fromJson(json);
+    } else {
+      throw ApiError.notFound(
+        message: "User not found.",
+      );
+    }
+  }
+
+  @override
+  Future<User> getUserByUsername(String username) async {
+    final json =
+        await mongo.collection(userCollection).findOne(where.eq("username", username));
+    if (json != null) {
+      return User.fromJson(json);
+    } else {
+      throw ApiError.notFound(
+        message: "User '$username' not found.",
+      );
+    }
   }
 
   @override
   Future<User> findUserByCredentials({
     String username,
-    String hashPassword,
+    String password,
   }) async {
-    final userJson =
-        await mongo.collection("hash").findOne(where.eq("username", username));
+    final creds = AuthCredentials(username, password);
+
+    final json = await mongo.collection("hash").findOne(where.eq("username", username));
+    if (json == null) {
+      throw ApiError.notFound(
+        message: "Credentials not found",
+      );
+    }
+
+    if (creds.passwordHash == json["passwordHash"]) {
+      return await getUserByUsername(username);
+    } else {
+      throw ApiError.forbidden(
+        message: "Incorrect credentials",
+      );
+    }
   }
 }

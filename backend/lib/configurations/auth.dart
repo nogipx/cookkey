@@ -22,7 +22,7 @@ Future<AngelAuth> configureAuth({
   auth.strategies['local'] = LocalAuthStrategy((username, password) async {
     return await userRepo.findUserByCredentials(
       username: username,
-      hashPassword: password,
+      password: password,
     );
   });
 

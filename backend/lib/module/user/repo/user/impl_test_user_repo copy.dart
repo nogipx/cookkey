@@ -1,7 +1,7 @@
 import 'package:backend/module/user/repo/export.dart';
 import 'package:sdk/domain.dart';
 
-class ImplMongoUserRepo implements UserRepo {
+class ImplTestUserRepo implements UserRepo {
   @override
   Future<User> getUserById(String id) async {
     final users = [
@@ -18,14 +18,20 @@ class ImplMongoUserRepo implements UserRepo {
   @override
   Future<User> findUserByCredentials({
     String username,
-    String hashPassword,
+    String password,
   }) async {
-    if (username == "test1" && hashPassword == "1111") {
+    if (username == "test1" && password == "1111") {
       return User(id: "qwfpgj", name: "test1");
-    } else if (username == "test2" && hashPassword == "2222") {
+    } else if (username == "test2" && password == "2222") {
       return User(id: "arstdh", name: "test2");
     } else {
       return null;
     }
+  }
+
+  @override
+  Future<User> getUserByUsername(String username) {
+    // TODO: implement getUserByUsername
+    throw UnimplementedError();
   }
 }

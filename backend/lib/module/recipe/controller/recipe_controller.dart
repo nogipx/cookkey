@@ -7,6 +7,7 @@ import 'package:backend/util/export.dart';
 import 'package:sdk/domain.dart';
 import 'package:uuid/uuid.dart';
 import 'package:meta/meta.dart';
+import 'package:angel_validate/angel_validate.dart';
 
 @Expose("/recipe")
 class RecipeController extends Controller {
@@ -102,10 +103,14 @@ class RecipeController extends Controller {
     final originRecipe = await getRecipeById(req, res, id);
 
     await req.parseBody();
-    final result = ValidRecipe.isValidInput.check(req.bodyAsMap);
+    final result = ValidRecipe.isValidInput.extend(<String, dynamic>{
+      "title?": [isNonEmptyString]
+    }).check(req.bodyAsMap);
 
     if (result.errors.isEmpty) {
-      final recipe = Recipe.fromJson(result.data).copyWith(
+      final mergedRecipe = originRecipe.toJson()..addAll(result.data);
+
+      final recipe = Recipe.fromJson(mergedRecipe).copyWith(
         id: originRecipe.id,
         author: originRecipe.author,
         publicVisible: originRecipe.publicVisible,

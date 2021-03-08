@@ -12,6 +12,7 @@ import 'package:backend/configurations/log.dart';
 import 'package:backend/module/user/controller/user_controller.dart';
 import 'package:logging/logging.dart';
 
+import 'module/recipe/export.dart';
 import 'module/user/export.dart';
 
 Future<void> main() async {
@@ -41,12 +42,17 @@ Future<Angel> createServer({Logger logger}) async {
   final db = await configureDatabase(app: app);
 
   final UserRepo userRepo = ImplMongoUserRepo(mongo: db);
+  final RecipeRepo recipeRepo = ImplMongoRecipeRepo(mongo: db);
 
   final auth = await configureAuth(app: app, userRepo: userRepo);
 
   final controllers = [
     AuthController(auth: auth),
     UserController(userRepo: userRepo),
+    RecipeController(
+      userRepo: userRepo,
+      recipeRepo: recipeRepo,
+    ),
   ];
 
   controllers.forEach((e) async => e.configureServer(app));

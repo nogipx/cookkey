@@ -3,10 +3,11 @@ import 'package:angel_framework/angel_framework.dart';
 import 'package:sdk/domain.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
-Future<bool> requireAdmin(
+Future<bool> requirePermission(
   RequestContext req,
   ResponseContext res, {
   UserPermission permission,
+  bool throwError = true,
 }) async {
   assert(req != null && res != null);
   await requireAuthentication<User>().call(req, res);
@@ -18,6 +19,14 @@ Future<bool> requireAdmin(
   final userAdminJson =
       await mongo.collection("admins").findOne(where.eq("userId", user.id));
 
+  bool _error([String message]) {
+    if (throwError) {
+      throw ApiError.forbidden(message: message);
+    } else {
+      return false;
+    }
+  }
+
   if (userAdminJson != null) {
     final permissionJson = await mongo
         .collection("permissions")
@@ -27,14 +36,9 @@ Future<bool> requireAdmin(
     if (permission == null || userPermission.canAccess(permission)) {
       return true;
     } else {
-      throw ApiError.forbidden(
-        message: "This action require higher permission level.",
-      );
+      return _error("This action requires higher permission level.");
     }
   } else {
-    throw ApiError.forbidden(
-      message: "This action require admin permisison",
-    );
+    return _error("This action requires admin permission.");
   }
-  // if (permission.canAccess(other))
 }

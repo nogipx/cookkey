@@ -34,4 +34,10 @@ class ImplTestUserRepo implements UserRepo {
     // TODO: implement getUserByUsername
     throw UnimplementedError();
   }
+
+  @override
+  Future<UserPermission> getPermission({String userId}) {
+    // TODO: implement getPermission
+    throw UnimplementedError();
+  }
 }

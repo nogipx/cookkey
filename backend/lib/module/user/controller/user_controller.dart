@@ -2,6 +2,7 @@ import 'package:angel_auth/angel_auth.dart';
 import 'package:angel_framework/angel_framework.dart';
 import 'package:angel_validate/angel_validate.dart';
 import 'package:backend/module/user/export.dart';
+import 'package:backend/util/permission.dart';
 import 'package:meta/meta.dart';
 import 'package:sdk/domain.dart';
 
@@ -26,11 +27,10 @@ class UserController extends Controller {
     ResponseContext res,
     String id,
   ) async {
+    await requirePermission(req, res, permission: UserPermission.blogger());
     final result = Validator(<String, dynamic>{
       "id": isNonEmptyString,
-    }).check(<String, dynamic>{
-      "id": req.params['id'],
-    });
+    }).check(req.params);
 
     return await userRepo.getUserById(result.data['id'] as String) ??
         AngelHttpException.notFound();

@@ -1,4 +1,5 @@
 import 'package:sdk/domain.dart';
+import 'package:meta/meta.dart';
 
 abstract class UserRepo {
   Future<User> getUserById(String id);
@@ -9,4 +10,6 @@ abstract class UserRepo {
     String username,
     String password,
   });
+
+  Future<UserPermission> getPermission({@required String userId});
 }

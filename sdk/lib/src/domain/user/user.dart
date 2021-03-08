@@ -42,7 +42,11 @@ class UserPermission extends Equatable {
       _$UserPermissionFromJson(json);
   Map<String, dynamic> toJson() => _$UserPermissionToJson(this);
 
-  factory UserPermission.level1() => UserPermission(level: 1);
+  bool canAccess(UserPermission minimalPermisison) => level >= minimalPermisison.level;
 
-  bool canAccess(UserPermission other) => level >= other.level;
+  factory UserPermission.regular() => UserPermission(level: 0);
+  factory UserPermission.blogger() => UserPermission(level: 100);
+  factory UserPermission.moderator() => UserPermission(level: 200);
+  factory UserPermission.admin() => UserPermission(level: 900);
+  factory UserPermission.owner() => UserPermission(level: 1000);
 }

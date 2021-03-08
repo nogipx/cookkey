@@ -31,7 +31,8 @@ UserPermission _$UserPermissionFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$UserPermissionToJson(UserPermission instance) => <String, dynamic>{
+Map<String, dynamic> _$UserPermissionToJson(UserPermission instance) =>
+    <String, dynamic>{
       'id': instance.id,
       'level': instance.level,
       'description': instance.description,

@@ -50,7 +50,20 @@ class ImplMongoRecipeRepo implements RecipeRepo {
 
   @override
   Future<List<Recipe>> filterPublicRecipes() {
-    // TODO: implement filterPublicRecipes
     throw UnimplementedError();
+  }
+
+  @override
+  Future<Recipe> publishRecipe(String id) async {
+    final recipe = (await getRecipeById(id)).copyWith(publicVisible: true);
+    await mongo.collection(recipeCollection).update(where.eq("id", id), recipe.toJson());
+    return recipe;
+  }
+
+  @override
+  Future<Recipe> unpublishRecipe(String id) async {
+    final recipe = (await getRecipeById(id)).copyWith(publicVisible: false);
+    await mongo.collection(recipeCollection).update(where.eq("id", id), recipe.toJson());
+    return recipe;
   }
 }

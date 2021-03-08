@@ -9,7 +9,7 @@ extension DeserializeMap on Map<String, dynamic> {
       return deserializer(this);
     } else {
       throw ApiError.notFound(
-        message: errorMessage ?? "$T is not found.",
+        message: errorMessage ?? "No $T found",
       );
     }
   }
@@ -24,7 +24,7 @@ extension DeserializeList on Stream<Map<String, dynamic>> {
       return map((e) => deserializer(e));
     } else {
       throw ApiError.notFound(
-        message: errorMessage ?? "Collection of $T is not found.",
+        message: errorMessage ?? "No $T collection found.",
       );
     }
   }

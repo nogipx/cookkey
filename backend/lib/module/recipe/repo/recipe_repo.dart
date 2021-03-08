@@ -14,4 +14,8 @@ abstract class RecipeRepo {
   Future<List<Recipe>> getRecipesByIds(List<String> ids);
 
   Future<Recipe> getRecipeById(String id);
+
+  Future<Recipe> publishRecipe(String id);
+
+  Future<Recipe> unpublishRecipe(String id);
 }

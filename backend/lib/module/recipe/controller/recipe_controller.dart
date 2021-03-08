@@ -55,7 +55,7 @@ class RecipeController extends Controller {
 
     final recipe = await recipeRepo.getRecipeById(id);
     if (recipe == null) {
-      throw ApiError.notFound(message: "Recipe not found.");
+      throw ApiError.notFound(message: "No recipe found.");
     }
 
     final hasPermission = await requirePermission(req, res,
@@ -64,11 +64,11 @@ class RecipeController extends Controller {
     if (hasPermission || recipe.publicVisible || recipe.author.id == req.user.id) {
       return recipe;
     } else {
-      throw ApiError.forbidden(message: "Cannot access recipe.");
+      throw ApiError.forbidden(message: "No access to recipe.");
     }
   }
 
-  @Expose("/get/all/:ids")
+  @Expose("/get/many/:ids")
   Future<List<Recipe>> getRecipeSByIdS(
     RequestContext req,
     ResponseContext res,
@@ -88,7 +88,7 @@ class RecipeController extends Controller {
             .toList();
 
     if (recipes == null || recipes.isEmpty) {
-      throw ApiError.notFound(message: "Recipes not found.");
+      throw ApiError.notFound(message: "No recipes found.");
     }
 
     return recipes;
@@ -145,6 +145,26 @@ class RecipeController extends Controller {
   ) async {
     await requireAuthentication<User>().call(req, res);
     return recipeRepo.getRecipesByUserId(req.user.id);
+  }
+
+  @Expose("/publish/:id", method: "PUT")
+  Future<Recipe> publishRecipe(
+    RequestContext req,
+    ResponseContext res,
+    String id,
+  ) async {
+    await requirePermission(req, res, permission: UserPermission.moderator());
+    return await recipeRepo.publishRecipe(id);
+  }
+
+  @Expose("/unpublish/:id", method: "PUT")
+  Future<Recipe> unpublishRecipe(
+    RequestContext req,
+    ResponseContext res,
+    String id,
+  ) async {
+    await requirePermission(req, res, permission: UserPermission.moderator());
+    return await recipeRepo.unpublishRecipe(id);
   }
 
   Future attachTagToRecipe() {}

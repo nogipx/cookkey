@@ -7,9 +7,11 @@ abstract class RecipeRepo {
 
   Future<void> deleteRecipeById(String id);
 
+  Future<List<Recipe>> filterPublicRecipes();
+
   Future<List<Recipe>> getRecipesByUserId(String id);
 
-  Future<List<Recipe>> filterPublicRecipes();
+  Future<List<Recipe>> getRecipesByIds(List<String> ids);
 
   Future<Recipe> getRecipeById(String id);
 }

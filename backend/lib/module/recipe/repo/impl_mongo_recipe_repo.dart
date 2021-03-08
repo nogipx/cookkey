@@ -33,13 +33,19 @@ class ImplMongoRecipeRepo implements RecipeRepo {
   @override
   Future<List<Recipe>> getRecipesByUserId(String id) async {
     final json = mongo.collection(recipeCollection).find(where.eq("author.id", id));
-    return json.deserialize<Recipe>((json) => Recipe.fromJson(json)).toList();
+    return await json.deserialize<Recipe>((json) => Recipe.fromJson(json)).toList();
   }
 
   @override
   Future<Recipe> getRecipeById(String id) async {
     final json = await mongo.collection(recipeCollection).findOne(where.eq("id", id));
     return json.deserialize<Recipe>((json) => Recipe.fromJson(json));
+  }
+
+  @override
+  Future<List<Recipe>> getRecipesByIds(List<String> ids) async {
+    final json = mongo.collection(recipeCollection).find(where.oneFrom("id", ids));
+    return await json.deserialize<Recipe>((json) => Recipe.fromJson(json)).toList();
   }
 
   @override

@@ -60,11 +60,37 @@ class RecipeController extends Controller {
     final hasPermission = await requirePermission(req, res,
         throwError: false, permission: UserPermission.moderator());
 
-    if (recipe.author.id == req.user.id || hasPermission) {
-      return recipeRepo.getRecipeById(id);
+    if (hasPermission || recipe.publicVisible || recipe.author.id == req.user.id) {
+      return recipe;
     } else {
       throw ApiError.forbidden(message: "Cannot access recipe.");
     }
+  }
+
+  @Expose("/get/all/:ids")
+  Future<List<Recipe>> getRecipeSByIdS(
+    RequestContext req,
+    ResponseContext res,
+    String ids,
+  ) async {
+    await requireAuthentication<User>().call(req, res);
+    final _user = req.user;
+    final _ids = ids.split(",").map((e) => e.trim()).toList();
+
+    final hasPermission = await requirePermission(req, res,
+        throwError: false, permission: UserPermission.moderator());
+
+    final recipes = hasPermission
+        ? await recipeRepo.getRecipesByIds(_ids)
+        : (await recipeRepo.getRecipesByIds(_ids))
+            .where((e) => e.publicVisible || e.author.id == _user.id)
+            .toList();
+
+    if (recipes == null || recipes.isEmpty) {
+      throw ApiError.notFound(message: "Recipes not found.");
+    }
+
+    return recipes;
   }
 
   @Expose("/update/:id", method: "PUT")
@@ -116,8 +142,5 @@ class RecipeController extends Controller {
     return recipeRepo.getRecipesByUserId(req.user.id);
   }
 
-  Future attachTagToRecipe(
-    RequestContext req,
-    ResponseContext res,
-  ) {}
+  Future attachTagToRecipe() {}
 }

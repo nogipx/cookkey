@@ -1,8 +1,6 @@
 import 'package:angel_validate/angel_validate.dart';
 import 'package:copy_with_extension/copy_with_extension.dart';
-import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:meta/meta.dart';
 import 'package:sdk/domain.dart';
 
 part 'recipe.g.dart';
@@ -39,13 +37,13 @@ class Recipe {
   factory Recipe.fromJson(Map<String, dynamic> json) => _$RecipeFromJson(json);
   Map<String, dynamic> toJson() => _$RecipeToJson(this);
 
-  static Validator get isValidInput {
+  static Validator get isValidCreate {
     return Validator(<String, dynamic>{
       "title*": [isNonEmptyString],
       "description": [isString],
       "nutritionalValue": [isMap],
       "averageCookTime, portions": [isNum, isNonNegative],
-      "publicVisible!, author!, id!": <dynamic>[]
+      "recipeTags!, publicVisible!, author!, id!": <dynamic>[]
     });
   }
 }
@@ -68,109 +66,6 @@ class NutritionalValue {
   factory NutritionalValue.fromJson(Map<String, dynamic> json) =>
       _$NutritionalValueFromJson(json);
   Map<String, dynamic> toJson() => _$NutritionalValueToJson(this);
-}
-
-@CopyWith()
-@JsonSerializable()
-class RecipeTagCategory extends Equatable {
-  final String id;
-
-  /// Determines tag category translation.
-  final String translationKey;
-
-  /// Controls which single or multi select in category is available.
-  final bool singleSelect;
-
-  const RecipeTagCategory({
-    @required this.id,
-    @required this.translationKey,
-    this.singleSelect = false,
-  }) : assert(id != null && translationKey != null);
-
-  @override
-  List<Object> get props => [id, translationKey, singleSelect];
-
-  @override
-  String toString() => translationKey;
-
-  factory RecipeTagCategory.fromJson(Map<String, dynamic> json) =>
-      _$RecipeTagCategoryFromJson(json);
-  Map<String, dynamic> toJson() => _$RecipeTagCategoryToJson(this);
-}
-
-/// Tags are received from backend.
-/// It will be used for categorize and filter receipts.
-@CopyWith()
-@JsonSerializable(explicitToJson: true)
-class RecipeTag extends Equatable {
-  final String id;
-
-  /// Determines which category this tag linked.
-  final RecipeTagCategory category;
-
-  /// Determines tag translation.
-  final String translationKey;
-
-  const RecipeTag({
-    @required this.id,
-    @required this.category,
-    @required this.translationKey,
-  }) : assert(id != null && category != null && translationKey != null);
-
-  @override
-  List<Object> get props => [id, category, translationKey];
-
-  @override
-  String toString() => "Tag [$category : $translationKey]";
-
-  factory RecipeTag.fromJson(Map<String, dynamic> json) => _$RecipeTagFromJson(json);
-  Map<String, dynamic> toJson() => _$RecipeTagToJson(this);
-
-  static Validator get isValid {
-    return Validator(<String, dynamic>{
-      "id*, translationKey": [isNotNull, isNonEmptyString],
-      "category": [isNotNull, isMap],
-    });
-  }
-
-  static Validator get isValidInput {
-    return Validator(<String, dynamic>{
-      "translationKey": [isNotNull, isNonEmptyString],
-      "category": [isNotNull, isMap],
-      "id!": <dynamic>[]
-    });
-  }
-}
-
-@JsonSerializable(explicitToJson: true)
-class Ingredient {
-  final String id;
-  final String type;
-  final String title;
-  final int measureValue;
-  final IngredientMeasure measureType;
-
-  Ingredient({
-    @required this.id,
-    @required this.type,
-    @required this.title,
-    this.measureValue,
-    this.measureType,
-  });
-
-  factory Ingredient.fromJson(Map<String, dynamic> json) => _$IngredientFromJson(json);
-  Map<String, dynamic> toJson() => _$IngredientToJson(this);
-}
-
-enum IngredientMeasure {
-  Glass,
-  Tablespoon,
-  TeaSpoon,
-  DessertSpoon,
-  Milliliter,
-  Kilogram,
-  Gram,
-  Liter,
 }
 
 class FoodImage {}

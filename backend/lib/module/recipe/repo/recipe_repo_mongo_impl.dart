@@ -16,7 +16,7 @@ class RecipeRepoMongoImpl implements RecipeRepo {
 
   @override
   Future<void> createRecipe(Recipe recipe) async {
-    await mongo.collection(recipeCollection).insert(recipe.toJson());
+    await mongo.collection(recipeCollection).insert(recipe.toJsonSimplifyTags());
   }
 
   @override
@@ -28,7 +28,7 @@ class RecipeRepoMongoImpl implements RecipeRepo {
   Future<void> updateRecipe(Recipe recipe) async {
     await mongo
         .collection(recipeCollection)
-        .update(where.eq("id", recipe.id), recipe.toJson());
+        .update(where.eq("id", recipe.id), recipe.toJsonSimplifyTags());
   }
 
   @override

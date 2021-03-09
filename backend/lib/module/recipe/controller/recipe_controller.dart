@@ -14,12 +14,12 @@ import 'package:angel_validate/angel_validate.dart';
 class RecipeController extends Controller {
   final UserRepo userRepo;
   final RecipeRepo recipeRepo;
-  final TagController tagController;
+  final TagRepo tagRepo;
 
   RecipeController({
     @required this.recipeRepo,
     @required this.userRepo,
-    @required this.tagController,
+    @required this.tagRepo,
   });
 
   @Expose("/create", method: "POST")
@@ -27,7 +27,7 @@ class RecipeController extends Controller {
     await requireAuthentication<User>().call(req, res);
     await req.parseBody();
 
-    final result = Recipe.isValidInput.check(req.bodyAsMap);
+    final result = Recipe.isValidCreate.check(req.bodyAsMap);
 
     if (result.errors.isEmpty) {
       final recipe = Recipe.fromJson(result.data).copyWith(
@@ -92,7 +92,7 @@ class RecipeController extends Controller {
     final originRecipe = await getRecipeById(req, res, id);
 
     await req.parseBody();
-    final result = Recipe.isValidInput.extend(<String, dynamic>{
+    final result = Recipe.isValidCreate.extend(<String, dynamic>{
       "title?": [isNonEmptyString]
     }).check(req.bodyAsMap);
 
@@ -147,15 +147,15 @@ class RecipeController extends Controller {
   Future addTagToRecipe(
       RequestContext req, ResponseContext res, String recipeId, String tagId) async {
     final recipe = await getRecipeById(req, res, recipeId);
-    final tag = await tagController.getTagById(req, res, tagId);
-    await recipeRepo.addTag(tag, recipe.id);
+    final tags = await tagRepo.getTagsByIds(tagId.split(","));
+    return await recipeRepo.addTags(tags, recipe.id);
   }
 
   @Expose("/:recipeId/removeTag/:tagId", method: "PUT")
   Future removeTagFromRecipe(
       RequestContext req, ResponseContext res, String recipeId, String tagId) async {
     final recipe = await getRecipeById(req, res, recipeId);
-    final tag = await tagController.getTagById(req, res, tagId);
-    await recipeRepo.removeTag(tag, recipe.id);
+    final tags = await tagRepo.getTagsByIds(tagId.split(","));
+    return await recipeRepo.removeTags(tags, recipe.id);
   }
 }

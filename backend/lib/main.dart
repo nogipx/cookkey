@@ -44,15 +44,15 @@ Future<Angel> createServer({Logger logger}) async {
 
   final UserRepo userRepo = UserRepoMongoImpl(mongo: db);
   final RecipeRepo recipeRepo = RecipeRepoMongoImpl(mongo: db);
-  final TagControllers tagRepo = TagRepoMongoImpl(mongo: db);
+  final TagRepo tagRepo = TagRepoMongoImpl(mongo: db);
 
   final auth = await configureAuth(app: app, userRepo: userRepo);
 
   final authController = AuthController(auth: auth);
   final userController = UserController(userRepo: userRepo);
   final tagController = TagController(tagRepo: tagRepo, recipeRepo: recipeRepo);
-  final recipeController = RecipeController(
-      userRepo: userRepo, recipeRepo: recipeRepo, tagController: tagController);
+  final recipeController =
+      RecipeController(userRepo: userRepo, recipeRepo: recipeRepo, tagRepo: tagRepo);
 
   [
     authController,

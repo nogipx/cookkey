@@ -1,6 +1,6 @@
 import 'package:sdk/domain.dart';
 
-abstract class TagControllers {
+abstract class TagRepo {
   Future<RecipeTag> createTag(RecipeTag tag);
 
   Future<RecipeTag> updateTag(RecipeTag tag);
@@ -12,6 +12,8 @@ abstract class TagControllers {
   Future<RecipeTag> getTagById(String id);
 
   Future<List<RecipeTag>> getTagsByCategoryId(String categoryId);
+
+  Future<List<RecipeTag>> getAllTags();
 
   Future<RecipeTag> changeCategory(RecipeTagCategory category, String tagId);
 }

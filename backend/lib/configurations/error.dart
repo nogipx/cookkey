@@ -20,6 +20,7 @@ Future<void> configureError(Angel app) async {
       );
     }
 
+    // ignore: unawaited_futures
     logError(
       apiError.message.color([ansiRedBg, ansiWhite]) + "\n${err.stackTrace ?? ''}",
       name: "${req.method} /${req.uri.pathSegments.join("/")}"

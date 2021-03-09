@@ -16,6 +16,7 @@ dependencies:
   angel_hot: ^2.0.0
   angel_mongo: ^2.0.0
   angel_validate: ^2.0.2
+  dartx: ^0.5.0
   crypto: ^2.0.0
   uuid: ^2.2.0
   validators: ^2.0.0

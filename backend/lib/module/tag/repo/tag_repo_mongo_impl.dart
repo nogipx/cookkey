@@ -4,7 +4,7 @@ import 'package:meta/meta.dart';
 import 'package:sdk/domain.dart';
 import 'package:backend/util/export.dart';
 
-class TagRepoMongoImpl implements TagControllers {
+class TagRepoMongoImpl implements TagRepo {
   final Db mongo;
 
   const TagRepoMongoImpl({@required this.mongo});
@@ -51,6 +51,12 @@ class TagRepoMongoImpl implements TagControllers {
   @override
   Future<List<RecipeTag>> getTagsByIds(List<String> ids) async {
     final json = mongo.collection(tagCollection).find(where.oneFrom("id", ids));
+    return await json.deserialize((json) => RecipeTag.fromJson(json)).toList();
+  }
+
+  @override
+  Future<List<RecipeTag>> getAllTags() async {
+    final json = mongo.collection(tagCollection).find();
     return await json.deserialize((json) => RecipeTag.fromJson(json)).toList();
   }
 }

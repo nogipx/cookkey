@@ -1,4 +1,3 @@
-import 'package:angel_auth/angel_auth.dart';
 import 'package:angel_framework/angel_framework.dart';
 import 'package:sdk/sdk.dart';
 

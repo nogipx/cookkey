@@ -1,9 +1,9 @@
 import 'package:backend/module/recipe/repo/recipe_repo.dart';
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:mongo_dart_query/mongo_aggregation.dart';
 import 'package:sdk/domain.dart';
 import 'package:meta/meta.dart';
 import 'package:backend/util/export.dart';
+import 'package:dartx/dartx.dart';
 
 class RecipeRepoMongoImpl implements RecipeRepo {
   final Db mongo;
@@ -55,17 +55,27 @@ class RecipeRepoMongoImpl implements RecipeRepo {
   }
 
   @override
-  Future<Recipe> addTag(RecipeTag tag, String id) async {
-    final recipe = await getRecipeById(id);
-    recipe.recipeTags.add(tag);
+  Future<Recipe> addTags(List<RecipeTag> tags, String id) async {
+    Recipe recipe = await getRecipeById(id);
+    if (recipe.recipeTags == null) {
+      recipe = recipe.copyWith(recipeTags: tags);
+    } else {
+      recipe = recipe.copyWith(
+        recipeTags: recipe.recipeTags.append(tags).distinctBy((e) => e.id).toList(),
+      );
+    }
     await updateRecipe(recipe);
     return recipe;
   }
 
   @override
-  Future<Recipe> removeTag(RecipeTag tag, String id) async {
+  Future<Recipe> removeTags(List<RecipeTag> tags, String id) async {
     final recipe = await getRecipeById(id);
-    recipe.recipeTags.removeWhere((e) => e.id == tag.id);
+    if (recipe.recipeTags == null || recipe.recipeTags.isEmpty) {
+      throw ApiError.conflict(message: "Recipe has no tag.");
+    }
+    final _tagsIds = tags.map((e) => e.id);
+    recipe.recipeTags.removeWhere((e) => _tagsIds.contains(e.id));
     await updateRecipe(recipe);
     return recipe;
   }

@@ -1,1 +1,1 @@
-final jwtKey = 'tairdtorhtoir';
+const jwtKey = 'tairdtorhtoir';

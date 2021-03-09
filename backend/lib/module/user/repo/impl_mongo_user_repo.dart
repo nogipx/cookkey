@@ -7,7 +7,7 @@ import 'package:backend/util/export.dart';
 class ImplMongoUserRepo implements UserRepo {
   final Db mongo;
 
-  ImplMongoUserRepo({@required this.mongo});
+  const ImplMongoUserRepo({@required this.mongo});
 
   static const userCollection = "user";
 

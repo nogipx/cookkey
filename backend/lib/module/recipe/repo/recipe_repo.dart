@@ -18,4 +18,10 @@ abstract class RecipeRepo {
   Future<Recipe> publishRecipe(String id);
 
   Future<Recipe> unpublishRecipe(String id);
+
+  Future<void> attachTag(RecipeTag tag, String id);
+
+  Future<void> detachTag(RecipeTag tag, String id);
+
+  Future<List<RecipeTag>> getTagsByRecipeId(String id);
 }

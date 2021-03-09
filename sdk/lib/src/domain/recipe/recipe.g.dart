@@ -32,6 +32,32 @@ extension RecipeCopyWith on Recipe {
       title: title ?? this.title,
     );
   }
+
+  Recipe copyWithNull({
+    bool author = false,
+    bool averageCookTime = false,
+    bool description = false,
+    bool id = false,
+    bool ingredients = false,
+    bool nutritionalValue = false,
+    bool portions = false,
+    bool publicVisible = false,
+    bool recipeTags = false,
+    bool title = false,
+  }) {
+    return Recipe(
+      author: author == true ? null : this.author,
+      averageCookTime: averageCookTime == true ? null : this.averageCookTime,
+      description: description == true ? null : this.description,
+      id: id == true ? null : this.id,
+      ingredients: ingredients == true ? null : this.ingredients,
+      nutritionalValue: nutritionalValue == true ? null : this.nutritionalValue,
+      portions: portions == true ? null : this.portions,
+      publicVisible: publicVisible == true ? null : this.publicVisible,
+      recipeTags: recipeTags == true ? null : this.recipeTags,
+      title: title == true ? null : this.title,
+    );
+  }
 }
 
 extension NutritionalValueCopyWith on NutritionalValue {
@@ -59,6 +85,20 @@ extension RecipeTagCategoryCopyWith on RecipeTagCategory {
     return RecipeTagCategory(
       id: id ?? this.id,
       singleSelect: singleSelect ?? this.singleSelect,
+      translationKey: translationKey ?? this.translationKey,
+    );
+  }
+}
+
+extension RecipeTagCopyWith on RecipeTag {
+  RecipeTag copyWith({
+    RecipeTagCategory category,
+    String id,
+    String translationKey,
+  }) {
+    return RecipeTag(
+      category: category ?? this.category,
+      id: id ?? this.id,
       translationKey: translationKey ?? this.translationKey,
     );
   }

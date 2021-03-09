@@ -1,8 +1,7 @@
 import 'package:angel_auth/angel_auth.dart';
 import 'package:angel_framework/angel_framework.dart';
-import 'package:backend/module/recipe/controller/validator.dart';
 import 'package:backend/module/recipe/export.dart';
-import 'package:backend/module/user/repo/user_repo.dart';
+import 'package:backend/module/user/repo/export.dart';
 import 'package:backend/util/export.dart';
 import 'package:sdk/domain.dart';
 import 'package:uuid/uuid.dart';
@@ -27,7 +26,7 @@ class RecipeController extends Controller {
     await requireAuthentication<User>().call(req, res);
     await req.parseBody();
 
-    final result = ValidRecipe.isValidInput.check(req.bodyAsMap);
+    final result = Recipe.isValidInput.check(req.bodyAsMap);
 
     if (result.errors.isEmpty) {
       final recipe = Recipe.fromJson(result.data).copyWith(
@@ -69,7 +68,7 @@ class RecipeController extends Controller {
   }
 
   @Expose("/get/many/:ids")
-  Future<List<Recipe>> getRecipeSByIdS(
+  Future<List<Recipe>> getRecipesByIds(
     RequestContext req,
     ResponseContext res,
     String ids,
@@ -103,7 +102,7 @@ class RecipeController extends Controller {
     final originRecipe = await getRecipeById(req, res, id);
 
     await req.parseBody();
-    final result = ValidRecipe.isValidInput.extend(<String, dynamic>{
+    final result = Recipe.isValidInput.extend(<String, dynamic>{
       "title?": [isNonEmptyString]
     }).check(req.bodyAsMap);
 

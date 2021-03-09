@@ -7,7 +7,7 @@ import 'package:backend/util/export.dart';
 class ImplMongoRecipeRepo implements RecipeRepo {
   final Db mongo;
 
-  ImplMongoRecipeRepo({
+  const ImplMongoRecipeRepo({
     @required this.mongo,
   }) : assert(mongo != null);
 
@@ -54,6 +54,20 @@ class ImplMongoRecipeRepo implements RecipeRepo {
   }
 
   @override
+  Future<void> attachTag(RecipeTag tag, String id) async {
+    final recipe = await getRecipeById(id);
+    recipe.recipeTags.add(tag);
+    return await updateRecipe(recipe);
+  }
+
+  @override
+  Future<void> detachTag(RecipeTag tag, String id) async {
+    final recipe = await getRecipeById(id);
+    recipe.recipeTags.removeWhere((e) => e.id == tag.id);
+    return await updateRecipe(recipe);
+  }
+
+  @override
   Future<Recipe> publishRecipe(String id) async {
     final recipe = (await getRecipeById(id)).copyWith(publicVisible: true);
     await mongo.collection(recipeCollection).update(where.eq("id", id), recipe.toJson());
@@ -65,5 +79,11 @@ class ImplMongoRecipeRepo implements RecipeRepo {
     final recipe = (await getRecipeById(id)).copyWith(publicVisible: false);
     await mongo.collection(recipeCollection).update(where.eq("id", id), recipe.toJson());
     return recipe;
+  }
+
+  @override
+  Future<List<RecipeTag>> getTagsByRecipeId(String id) async {
+    final recipe = await getRecipeById(id);
+    return recipe.recipeTags;
   }
 }

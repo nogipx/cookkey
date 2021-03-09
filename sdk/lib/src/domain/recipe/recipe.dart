@@ -1,3 +1,4 @@
+import 'package:angel_validate/angel_validate.dart';
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -6,7 +7,7 @@ import 'package:sdk/domain.dart';
 
 part 'recipe.g.dart';
 
-@CopyWith()
+@CopyWith(generateCopyWithNull: true)
 @JsonSerializable(explicitToJson: true)
 class Recipe {
   final String id;
@@ -37,6 +38,16 @@ class Recipe {
 
   factory Recipe.fromJson(Map<String, dynamic> json) => _$RecipeFromJson(json);
   Map<String, dynamic> toJson() => _$RecipeToJson(this);
+
+  static Validator get isValidInput {
+    return Validator(<String, dynamic>{
+      "title*": [isNonEmptyString],
+      "description": [isString],
+      "nutritionalValue": [isMap],
+      "averageCookTime, portions": [isNum, isNonNegative],
+      "publicVisible!, author!, id!": <dynamic>[]
+    });
+  }
 }
 
 @CopyWith()
@@ -89,6 +100,7 @@ class RecipeTagCategory extends Equatable {
 
 /// Tags are received from backend.
 /// It will be used for categorize and filter receipts.
+@CopyWith()
 @JsonSerializable(explicitToJson: true)
 class RecipeTag extends Equatable {
   final String id;
@@ -113,6 +125,21 @@ class RecipeTag extends Equatable {
 
   factory RecipeTag.fromJson(Map<String, dynamic> json) => _$RecipeTagFromJson(json);
   Map<String, dynamic> toJson() => _$RecipeTagToJson(this);
+
+  static Validator get isValid {
+    return Validator(<String, dynamic>{
+      "id*, translationKey": [isNotNull, isNonEmptyString],
+      "category": [isNotNull, isMap],
+    });
+  }
+
+  static Validator get isValidInput {
+    return Validator(<String, dynamic>{
+      "translationKey": [isNotNull, isNonEmptyString],
+      "category": [isNotNull, isMap],
+      "id!": <dynamic>[]
+    });
+  }
 }
 
 @JsonSerializable(explicitToJson: true)

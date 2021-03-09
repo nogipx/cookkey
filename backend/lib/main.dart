@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:angel_container/mirrors.dart';
 import 'package:angel_framework/angel_framework.dart';
 import 'package:angel_hot/angel_hot.dart';
+import 'package:backend/config.dart';
 import 'package:backend/configurations/auth.dart';
 import 'package:backend/configurations/database.dart';
 import 'package:backend/configurations/error.dart';
@@ -42,23 +43,45 @@ Future<Angel> createServer({Logger logger}) async {
 
   final db = await configureDatabase(app: app);
 
-  final UserRepo userRepo = UserRepoMongoImpl(mongo: db);
-  final RecipeRepo recipeRepo = RecipeRepoMongoImpl(mongo: db);
-  final TagRepo tagRepo = TagRepoMongoImpl(mongo: db);
+  final UserRepo userRepo = UserRepoMongoImpl(
+    mongo: db,
+    adminCollection: adminCollection,
+    passwordHashCollection: passwordHashCollection,
+    userCollection: userCollection,
+  );
+  final RecipeRepo recipeRepo = RecipeRepoMongoImpl(
+    mongo: db,
+    recipeCollection: recipeCollection,
+  );
+  final TagRepo tagRepo = TagRepoMongoImpl(
+    mongo: db,
+    tagCollection: tagCollection,
+  );
+  final TagCategoryRepo tagCategoryRepo = TagCategoryRepoMongoImpl(
+    mongo: db,
+    tagCategoryCollection: tagCategoryCollection,
+  );
 
   final auth = await configureAuth(app: app, userRepo: userRepo);
 
   final authController = AuthController(auth: auth);
   final userController = UserController(userRepo: userRepo);
-  final tagController = TagController(tagRepo: tagRepo, recipeRepo: recipeRepo);
-  final recipeController =
-      RecipeController(userRepo: userRepo, recipeRepo: recipeRepo, tagRepo: tagRepo);
+  final tagCategoryController = TagCategoryController(tagCategoryRepo: tagCategoryRepo);
+  final tagController = TagController(
+    tagRepo: tagRepo,
+    tagCategoryRepo: tagCategoryRepo,
+  );
+  final recipeController = RecipeController(
+    recipeRepo: recipeRepo,
+    tagRepo: tagRepo,
+  );
 
   [
     authController,
     userController,
     recipeController,
     tagController,
+    tagCategoryController,
   ].forEach((e) async => e.configureServer(app));
 
   await configureError(app);

@@ -6,10 +6,12 @@ import 'package:backend/util/export.dart';
 
 class TagRepoMongoImpl implements TagRepo {
   final Db mongo;
+  final String tagCollection;
 
-  const TagRepoMongoImpl({@required this.mongo});
-
-  static const tagCollection = "tag";
+  const TagRepoMongoImpl({
+    @required this.mongo,
+    @required this.tagCollection,
+  });
 
   @override
   Future<RecipeTag> createTag(RecipeTag tag) async {
@@ -36,8 +38,7 @@ class TagRepoMongoImpl implements TagRepo {
 
   @override
   Future<RecipeTag> changeCategory(RecipeTagCategory category, String tagId) async {
-    final tag = await getTagById(tagId);
-    tag.copyWith(category: category);
+    final tag = (await getTagById(tagId)).copyWith(category: category);
     return await updateTag(tag);
   }
 

@@ -2,18 +2,17 @@ import 'package:angel_framework/angel_framework.dart';
 import 'package:backend/module/tag/export.dart';
 import 'package:backend/util/export.dart';
 import 'package:meta/meta.dart';
-import 'package:backend/module/recipe/export.dart';
 import 'package:sdk/sdk.dart';
 import 'package:uuid/uuid.dart';
 
 @Expose("/tag")
 class TagController extends Controller {
   final TagRepo tagRepo;
-  final RecipeRepo recipeRepo;
+  final TagCategoryRepo tagCategoryRepo;
 
   TagController({
     @required this.tagRepo,
-    @required this.recipeRepo,
+    @required this.tagCategoryRepo,
   });
 
   @Expose("/create", method: "POST")
@@ -81,5 +80,12 @@ class TagController extends Controller {
   @Expose("/all", method: "GET")
   Future<List<RecipeTag>> getAllTags(RequestContext req, ResponseContext res) async {
     return await tagRepo.getAllTags();
+  }
+
+  @Expose("/:tagId/changeCategory/:categoryId", method: "PUT")
+  Future<RecipeTag> changeCategory(
+      RequestContext req, ResponseContext res, String tagId, String categoryId) async {
+    final category = await tagCategoryRepo.getCategoryById(categoryId);
+    return await tagRepo.changeCategory(category, tagId);
   }
 }

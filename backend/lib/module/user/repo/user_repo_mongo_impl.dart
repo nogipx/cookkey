@@ -6,10 +6,19 @@ import 'package:backend/util/export.dart';
 
 class UserRepoMongoImpl implements UserRepo {
   final Db mongo;
+  final String userCollection;
+  final String passwordHashCollection;
+  final String adminCollection;
 
-  const UserRepoMongoImpl({@required this.mongo});
-
-  static const userCollection = "user";
+  const UserRepoMongoImpl({
+    @required this.mongo,
+    @required this.userCollection,
+    @required this.adminCollection,
+    @required this.passwordHashCollection,
+  }) : assert(mongo != null &&
+            userCollection != null &&
+            passwordHashCollection != null &&
+            adminCollection != null);
 
   @override
   Future<User> getUserById(String id) async {
@@ -31,7 +40,9 @@ class UserRepoMongoImpl implements UserRepo {
   }) async {
     final creds = AuthCredentials(username, password);
 
-    final json = await mongo.collection("hash").findOne(where.eq("username", username));
+    final json = await mongo
+        .collection(passwordHashCollection)
+        .findOne(where.eq("username", username));
     if (json == null) {
       throw ApiError.notFound(
         message: "Credentials not found",

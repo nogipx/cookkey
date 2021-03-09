@@ -3,7 +3,6 @@ import 'package:angel_framework/angel_framework.dart';
 import 'package:backend/module/recipe/export.dart';
 import 'package:backend/module/tag/export.dart';
 import 'package:backend/module/tag/repo/tag_repo.dart';
-import 'package:backend/module/user/repo/export.dart';
 import 'package:backend/util/export.dart';
 import 'package:sdk/domain.dart';
 import 'package:uuid/uuid.dart';
@@ -12,13 +11,11 @@ import 'package:angel_validate/angel_validate.dart';
 
 @Expose("/recipe")
 class RecipeController extends Controller {
-  final UserRepo userRepo;
   final RecipeRepo recipeRepo;
   final TagRepo tagRepo;
 
   RecipeController({
     @required this.recipeRepo,
-    @required this.userRepo,
     @required this.tagRepo,
   });
 
@@ -45,7 +42,44 @@ class RecipeController extends Controller {
     }
   }
 
-  @Expose("/get/:id", method: "GET")
+  @Expose("/update/:id", method: "PUT")
+  Future<Recipe> updateRecipe(RequestContext req, ResponseContext res, String id) async {
+    final originRecipe = await getRecipeById(req, res, id);
+
+    await req.parseBody();
+    final result = Recipe.isValidCreate.extend(<String, dynamic>{
+      "title?": [isNonEmptyString]
+    }).check(req.bodyAsMap);
+
+    if (result.errors.isEmpty) {
+      final mergedRecipe = originRecipe.toJson()..addAll(result.data);
+
+      final recipe = Recipe.fromJson(mergedRecipe).copyWith(
+        id: originRecipe.id,
+        author: originRecipe.author,
+        publicVisible: originRecipe.publicVisible,
+      );
+      await recipeRepo.updateRecipe(recipe);
+      return recipe;
+    } else {
+      throw ApiError.notProcessable(
+        message: "Invalid update data",
+        details: result.errors,
+      );
+    }
+  }
+
+  // TODO(nogipx): Tests required
+  @Expose("/delete", method: "DELETE")
+  Future deleteRecipe(RequestContext req, ResponseContext res) async {
+    await requireAuthentication<User>().call(req, res);
+    await req.parseBody();
+    final targetDeleteRecipeId = req.bodyAsMap["recipeId"] as String;
+    final recipe = await getRecipeById(req, res, targetDeleteRecipeId);
+    return recipeRepo.deleteRecipeById(recipe.id);
+  }
+
+  @Expose("/get/:id", method: "GET", middleware: [])
   Future<Recipe> getRecipeById(RequestContext req, ResponseContext res, String id) async {
     await requireAuthentication<User>().call(req, res);
 
@@ -85,43 +119,6 @@ class RecipeController extends Controller {
     }
 
     return recipes;
-  }
-
-  @Expose("/update/:id", method: "PUT")
-  Future<Recipe> updateRecipe(RequestContext req, ResponseContext res, String id) async {
-    final originRecipe = await getRecipeById(req, res, id);
-
-    await req.parseBody();
-    final result = Recipe.isValidCreate.extend(<String, dynamic>{
-      "title?": [isNonEmptyString]
-    }).check(req.bodyAsMap);
-
-    if (result.errors.isEmpty) {
-      final mergedRecipe = originRecipe.toJson()..addAll(result.data);
-
-      final recipe = Recipe.fromJson(mergedRecipe).copyWith(
-        id: originRecipe.id,
-        author: originRecipe.author,
-        publicVisible: originRecipe.publicVisible,
-      );
-      await recipeRepo.updateRecipe(recipe);
-      return recipe;
-    } else {
-      throw ApiError.notProcessable(
-        message: "Invalid update data",
-        details: result.errors,
-      );
-    }
-  }
-
-  // TODO(nogipx): Tests required
-  @Expose("/delete", method: "DELETE")
-  Future deleteRecipe(RequestContext req, ResponseContext res) async {
-    await requireAuthentication<User>().call(req, res);
-    await req.parseBody();
-    final targetDeleteRecipeId = req.bodyAsMap["recipeId"] as String;
-    final recipe = await getRecipeById(req, res, targetDeleteRecipeId);
-    return recipeRepo.deleteRecipeById(recipe.id);
   }
 
   @Expose("/my", method: "GET")

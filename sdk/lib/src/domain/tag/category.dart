@@ -1,3 +1,4 @@
+import 'package:angel_validate/angel_validate.dart';
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -31,4 +32,12 @@ class RecipeTagCategory extends Equatable {
   factory RecipeTagCategory.fromJson(Map<String, dynamic> json) =>
       _$RecipeTagCategoryFromJson(json);
   Map<String, dynamic> toJson() => _$RecipeTagCategoryToJson(this);
+
+  static Validator get isValidCreate {
+    return Validator(<String, dynamic>{
+      "singleSelect": [isBool],
+      "translationKey": [isNonEmptyString],
+      "id!": <dynamic>[]
+    });
+  }
 }

@@ -7,12 +7,12 @@ import 'package:dartx/dartx.dart';
 
 class RecipeRepoMongoImpl implements RecipeRepo {
   final Db mongo;
+  final String recipeCollection;
 
   const RecipeRepoMongoImpl({
     @required this.mongo,
-  }) : assert(mongo != null);
-
-  static const recipeCollection = "recipe";
+    @required this.recipeCollection,
+  }) : assert(mongo != null && recipeCollection != null);
 
   @override
   Future<void> createRecipe(Recipe recipe) async {
@@ -61,7 +61,7 @@ class RecipeRepoMongoImpl implements RecipeRepo {
       recipe = recipe.copyWith(recipeTags: tags);
     } else {
       recipe = recipe.copyWith(
-        recipeTags: recipe.recipeTags.append(tags).distinctBy((e) => e.id).toList(),
+        recipeTags: recipe.recipeTags.prepend(tags).distinctBy((e) => e.id).toList(),
       );
     }
     await updateRecipe(recipe);

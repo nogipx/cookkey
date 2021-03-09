@@ -1,13 +1,14 @@
 import 'package:backend/module/recipe/repo/recipe_repo.dart';
 import 'package:mongo_dart/mongo_dart.dart';
+import 'package:mongo_dart_query/mongo_aggregation.dart';
 import 'package:sdk/domain.dart';
 import 'package:meta/meta.dart';
 import 'package:backend/util/export.dart';
 
-class ImplMongoRecipeRepo implements RecipeRepo {
+class RecipeRepoMongoImpl implements RecipeRepo {
   final Db mongo;
 
-  const ImplMongoRecipeRepo({
+  const RecipeRepoMongoImpl({
     @required this.mongo,
   }) : assert(mongo != null);
 
@@ -54,17 +55,19 @@ class ImplMongoRecipeRepo implements RecipeRepo {
   }
 
   @override
-  Future<void> attachTag(RecipeTag tag, String id) async {
+  Future<Recipe> addTag(RecipeTag tag, String id) async {
     final recipe = await getRecipeById(id);
     recipe.recipeTags.add(tag);
-    return await updateRecipe(recipe);
+    await updateRecipe(recipe);
+    return recipe;
   }
 
   @override
-  Future<void> detachTag(RecipeTag tag, String id) async {
+  Future<Recipe> removeTag(RecipeTag tag, String id) async {
     final recipe = await getRecipeById(id);
     recipe.recipeTags.removeWhere((e) => e.id == tag.id);
-    return await updateRecipe(recipe);
+    await updateRecipe(recipe);
+    return recipe;
   }
 
   @override

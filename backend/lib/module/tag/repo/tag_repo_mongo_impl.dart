@@ -4,10 +4,10 @@ import 'package:meta/meta.dart';
 import 'package:sdk/domain.dart';
 import 'package:backend/util/export.dart';
 
-class ImplMongoTagRepo implements TagRepo {
+class TagRepoMongoImpl implements TagControllers {
   final Db mongo;
 
-  const ImplMongoTagRepo({@required this.mongo});
+  const TagRepoMongoImpl({@required this.mongo});
 
   static const tagCollection = "tag";
 

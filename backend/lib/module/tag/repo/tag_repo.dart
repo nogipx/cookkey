@@ -1,6 +1,6 @@
 import 'package:sdk/domain.dart';
 
-abstract class TagRepo {
+abstract class TagControllers {
   Future<RecipeTag> createTag(RecipeTag tag);
 
   Future<RecipeTag> updateTag(RecipeTag tag);

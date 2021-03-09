@@ -1,6 +1,8 @@
 import 'package:angel_auth/angel_auth.dart';
 import 'package:angel_framework/angel_framework.dart';
 import 'package:backend/module/recipe/export.dart';
+import 'package:backend/module/tag/export.dart';
+import 'package:backend/module/tag/repo/tag_repo.dart';
 import 'package:backend/module/user/repo/export.dart';
 import 'package:backend/util/export.dart';
 import 'package:sdk/domain.dart';
@@ -12,10 +14,12 @@ import 'package:angel_validate/angel_validate.dart';
 class RecipeController extends Controller {
   final UserRepo userRepo;
   final RecipeRepo recipeRepo;
+  final TagController tagController;
 
   RecipeController({
     @required this.recipeRepo,
     @required this.userRepo,
+    @required this.tagController,
   });
 
   @Expose("/create", method: "POST")
@@ -166,5 +170,27 @@ class RecipeController extends Controller {
     return await recipeRepo.unpublishRecipe(id);
   }
 
-  Future attachTagToRecipe() {}
+  @Expose("/:recipeId/addTag/:tagId", method: "PUT")
+  Future addTagToRecipe(
+    RequestContext req,
+    ResponseContext res,
+    String recipeId,
+    String tagId,
+  ) async {
+    final recipe = await getRecipeById(req, res, recipeId);
+    final tag = await tagController.getTagById(req, res, tagId);
+    await recipeRepo.addTag(tag, recipe.id);
+  }
+
+  @Expose("/:recipeId/removeTag/:tagId", method: "PUT")
+  Future removeTagFromRecipe(
+    RequestContext req,
+    ResponseContext res,
+    String recipeId,
+    String tagId,
+  ) async {
+    final recipe = await getRecipeById(req, res, recipeId);
+    final tag = await tagController.getTagById(req, res, tagId);
+    await recipeRepo.removeTag(tag, recipe.id);
+  }
 }

@@ -4,10 +4,10 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'package:meta/meta.dart';
 import 'package:backend/util/export.dart';
 
-class ImplMongoUserRepo implements UserRepo {
+class UserRepoMongoImpl implements UserRepo {
   final Db mongo;
 
-  const ImplMongoUserRepo({@required this.mongo});
+  const UserRepoMongoImpl({@required this.mongo});
 
   static const userCollection = "user";
 

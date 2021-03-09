@@ -15,10 +15,28 @@ class TagController extends Controller {
     @required this.recipeRepo,
   });
 
-  @Expose("/:id")
-  Future<RecipeTag> getTagById(
+  @Expose("/create", method: "POST")
+  Future<RecipeTag> createTag(
     RequestContext req,
     ResponseContext res,
-    String tagId,
-  ) {}
+  ) async {
+    throw UnimplementedError();
+  }
+
+  @Expose("/delete", method: "DELETE")
+  Future<RecipeTag> deleteTag(RequestContext req, ResponseContext res) async {
+    throw UnimplementedError();
+  }
+
+  @Expose("/update/:tagId", method: "PUT")
+  Future<RecipeTag> updateTag(
+      RequestContext req, ResponseContext res, String tagId) async {
+    throw UnimplementedError();
+  }
+
+  @Expose("/:id", method: "GET")
+  Future<RecipeTag> getTagById(
+      RequestContext req, ResponseContext res, String tagId) async {
+    throw UnimplementedError();
+  }
 }

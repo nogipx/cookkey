@@ -14,19 +14,15 @@ class UserController extends Controller {
     @required this.userRepo,
   });
 
-  @Expose("/me")
+  @Expose("/me", method: "GET")
   Future me(RequestContext req, ResponseContext res) async {
     await requireAuthentication<User>().call(req, res);
     final user = req.container.make<User>();
     return await userRepo.getUserById(user.id);
   }
 
-  @Expose("/public/:id")
-  Future getPublicUser(
-    RequestContext req,
-    ResponseContext res,
-    String id,
-  ) async {
+  @Expose("/public/:id", method: "GET")
+  Future getPublicUser(RequestContext req, ResponseContext res, String id) async {
     await requirePermission(req, res, permission: UserPermission.blogger());
     final result = Validator(<String, dynamic>{
       "id": isNonEmptyString,

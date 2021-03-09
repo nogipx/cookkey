@@ -23,10 +23,7 @@ class RecipeController extends Controller {
   });
 
   @Expose("/create", method: "POST")
-  Future createRecipe(
-    RequestContext req,
-    ResponseContext res,
-  ) async {
+  Future createRecipe(RequestContext req, ResponseContext res) async {
     await requireAuthentication<User>().call(req, res);
     await req.parseBody();
 
@@ -48,12 +45,8 @@ class RecipeController extends Controller {
     }
   }
 
-  @Expose("/get/:id")
-  Future<Recipe> getRecipeById(
-    RequestContext req,
-    ResponseContext res,
-    String id,
-  ) async {
+  @Expose("/get/:id", method: "GET")
+  Future<Recipe> getRecipeById(RequestContext req, ResponseContext res, String id) async {
     await requireAuthentication<User>().call(req, res);
 
     final recipe = await recipeRepo.getRecipeById(id);
@@ -71,12 +64,9 @@ class RecipeController extends Controller {
     }
   }
 
-  @Expose("/get/many/:ids")
+  @Expose("/get/many/:ids", method: "GET")
   Future<List<Recipe>> getRecipesByIds(
-    RequestContext req,
-    ResponseContext res,
-    String ids,
-  ) async {
+      RequestContext req, ResponseContext res, String ids) async {
     await requireAuthentication<User>().call(req, res);
     final _user = req.user;
     final _ids = ids.split(",").map((e) => e.trim()).toList();
@@ -98,11 +88,7 @@ class RecipeController extends Controller {
   }
 
   @Expose("/update/:id", method: "PUT")
-  Future<Recipe> updateRecipe(
-    RequestContext req,
-    ResponseContext res,
-    String id,
-  ) async {
+  Future<Recipe> updateRecipe(RequestContext req, ResponseContext res, String id) async {
     final originRecipe = await getRecipeById(req, res, id);
 
     await req.parseBody();
@@ -130,10 +116,7 @@ class RecipeController extends Controller {
 
   // TODO(nogipx): Tests required
   @Expose("/delete", method: "DELETE")
-  Future deleteRecipe(
-    RequestContext req,
-    ResponseContext res,
-  ) async {
+  Future deleteRecipe(RequestContext req, ResponseContext res) async {
     await requireAuthentication<User>().call(req, res);
     await req.parseBody();
     final targetDeleteRecipeId = req.bodyAsMap["recipeId"] as String;
@@ -141,42 +124,28 @@ class RecipeController extends Controller {
     return recipeRepo.deleteRecipeById(recipe.id);
   }
 
-  @Expose("/my")
-  Future<List<Recipe>> myRecipes(
-    RequestContext req,
-    ResponseContext res,
-  ) async {
+  @Expose("/my", method: "GET")
+  Future<List<Recipe>> myRecipes(RequestContext req, ResponseContext res) async {
     await requireAuthentication<User>().call(req, res);
     return recipeRepo.getRecipesByUserId(req.user.id);
   }
 
   @Expose("/publish/:id", method: "PUT")
-  Future<Recipe> publishRecipe(
-    RequestContext req,
-    ResponseContext res,
-    String id,
-  ) async {
+  Future<Recipe> publishRecipe(RequestContext req, ResponseContext res, String id) async {
     await requirePermission(req, res, permission: UserPermission.moderator());
     return await recipeRepo.publishRecipe(id);
   }
 
   @Expose("/unpublish/:id", method: "PUT")
   Future<Recipe> unpublishRecipe(
-    RequestContext req,
-    ResponseContext res,
-    String id,
-  ) async {
+      RequestContext req, ResponseContext res, String id) async {
     await requirePermission(req, res, permission: UserPermission.moderator());
     return await recipeRepo.unpublishRecipe(id);
   }
 
   @Expose("/:recipeId/addTag/:tagId", method: "PUT")
   Future addTagToRecipe(
-    RequestContext req,
-    ResponseContext res,
-    String recipeId,
-    String tagId,
-  ) async {
+      RequestContext req, ResponseContext res, String recipeId, String tagId) async {
     final recipe = await getRecipeById(req, res, recipeId);
     final tag = await tagController.getTagById(req, res, tagId);
     await recipeRepo.addTag(tag, recipe.id);
@@ -184,11 +153,7 @@ class RecipeController extends Controller {
 
   @Expose("/:recipeId/removeTag/:tagId", method: "PUT")
   Future removeTagFromRecipe(
-    RequestContext req,
-    ResponseContext res,
-    String recipeId,
-    String tagId,
-  ) async {
+      RequestContext req, ResponseContext res, String recipeId, String tagId) async {
     final recipe = await getRecipeById(req, res, recipeId);
     final tag = await tagController.getTagById(req, res, tagId);
     await recipeRepo.removeTag(tag, recipe.id);

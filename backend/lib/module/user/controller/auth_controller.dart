@@ -12,10 +12,7 @@ class AuthController extends Controller {
   AuthController({@required this.auth});
 
   @Expose("/local", method: "POST")
-  Function loginLocal(
-    RequestContext req,
-    ResponseContext res,
-  ) {
+  Function loginLocal(RequestContext req, ResponseContext res) {
     res.serializer = (dynamic value) {
       final data = value as Map<String, dynamic>;
       return jsonEncode(Auth(
@@ -27,10 +24,7 @@ class AuthController extends Controller {
   }
 
   @Expose("/logout", method: "POST")
-  Future logout(
-    RequestContext req,
-    ResponseContext res,
-  ) async {
+  Future logout(RequestContext req, ResponseContext res) async {
     await requireAuthentication<User>().call(req, res);
     auth.logout();
   }

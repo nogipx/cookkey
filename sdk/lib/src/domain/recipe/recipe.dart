@@ -17,7 +17,7 @@ class Recipe {
   final bool publicVisible;
   final NutritionalValue nutritionalValue;
   final List<Ingredient> ingredients;
-  final List<RecipeTag> recipeTags;
+  final List<String> recipeTags;
   // final List<FoodImage> images;
 
   const Recipe({

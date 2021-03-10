@@ -16,7 +16,7 @@ extension RecipeCopyWith on Recipe {
     NutritionalValue nutritionalValue,
     int portions,
     bool publicVisible,
-    List<RecipeTag> recipeTags,
+    List<String> recipeTags,
     String title,
   }) {
     return Recipe(
@@ -83,10 +83,7 @@ extension NutritionalValueCopyWith on NutritionalValue {
 Recipe _$RecipeFromJson(Map<String, dynamic> json) {
   return Recipe(
     id: json['id'] as String,
-    recipeTags: (json['recipeTags'] as List)
-        ?.map((e) =>
-            e == null ? null : RecipeTag.fromJson(e as Map<String, dynamic>))
-        ?.toList(),
+    recipeTags: (json['recipeTags'] as List)?.map((e) => e as String)?.toList(),
     title: json['title'] as String,
     description: json['description'] as String,
     averageCookTime: json['averageCookTime'] as int,
@@ -116,7 +113,7 @@ Map<String, dynamic> _$RecipeToJson(Recipe instance) => <String, dynamic>{
       'publicVisible': instance.publicVisible,
       'nutritionalValue': instance.nutritionalValue?.toJson(),
       'ingredients': instance.ingredients?.map((e) => e?.toJson())?.toList(),
-      'recipeTags': instance.recipeTags?.map((e) => e?.toJson())?.toList(),
+      'recipeTags': instance.recipeTags,
     };
 
 NutritionalValue _$NutritionalValueFromJson(Map<String, dynamic> json) {

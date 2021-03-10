@@ -7,7 +7,8 @@ abstract class RecipeRepo {
 
   Future<void> deleteRecipeById(String id);
 
-  Future<List<Recipe>> filterPublicRecipes();
+  Future filterPublicRecipes(
+      {FilterOption filterOption, String userId, bool hasPermission});
 
   Future<List<Recipe>> getRecipesByUserId(String id);
 
@@ -19,9 +20,9 @@ abstract class RecipeRepo {
 
   Future<Recipe> unpublishRecipe(String id);
 
-  Future<Recipe> addTags(List<RecipeTag> tags, String id);
+  Future<Recipe> addTags(List<String> tags, String id);
 
-  Future<Recipe> removeTags(List<RecipeTag> tags, String id);
+  Future<Recipe> removeTags(List<String> tags, String id);
 
   Future<List<RecipeTag>> getTagsByRecipeId(String id);
 }

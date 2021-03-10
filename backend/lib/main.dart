@@ -49,13 +49,14 @@ Future<Angel> createServer({Logger logger}) async {
     passwordHashCollection: passwordHashCollection,
     userCollection: userCollection,
   );
-  final RecipeRepo recipeRepo = RecipeRepoMongoImpl(
-    mongo: db,
-    recipeCollection: recipeCollection,
-  );
   final TagRepo tagRepo = TagRepoMongoImpl(
     mongo: db,
     tagCollection: tagCollection,
+  );
+  final RecipeRepo recipeRepo = RecipeRepoMongoImpl(
+    mongo: db,
+    recipeCollection: recipeCollection,
+    tagRepo: tagRepo,
   );
   final TagCategoryRepo tagCategoryRepo = TagCategoryRepoMongoImpl(
     mongo: db,

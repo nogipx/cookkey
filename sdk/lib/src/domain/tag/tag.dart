@@ -25,8 +25,8 @@ class RecipeTag extends Equatable {
 
   const RecipeTag({
     @required this.id,
-    @required this.category,
-    @required this.translationKey,
+    this.category,
+    this.translationKey,
     this.isVisible = true,
   }) : assert(id != null);
 

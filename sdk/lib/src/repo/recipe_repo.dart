@@ -1,4 +1,5 @@
 import 'package:sdk/domain.dart';
+import 'package:meta/meta.dart';
 
 abstract class RecipeRepo {
   Future<Recipe> createRecipe(Recipe recipe);
@@ -7,8 +8,8 @@ abstract class RecipeRepo {
 
   Future<void> deleteRecipeById(String recipeId);
 
-  Future<List<Recipe>> filterPublicRecipes(
-      {FilterOption filterOption, String userId, bool hasPermission});
+  Future<List<Recipe>> filterRecipes(
+      {@required FilterOption filterOption, String userId, bool hasPermission});
 
   Future<List<Recipe>> getRecipesByUserId(String userId);
 

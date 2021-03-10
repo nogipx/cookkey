@@ -178,10 +178,11 @@ class RecipeController extends Controller with AppPermission {
     final filterOption = FilterOption.parse(query);
     final hasPermission = await requirePermission(req, res,
         permission: AppPermission.editOtherUserRecipePermission, throwError: false);
-    return await recipeRepo.filterPublicRecipes(
+
+    return await recipeRepo.filterRecipes(
       filterOption: filterOption,
       hasPermission: hasPermission,
-      userId: req.user.id,
+      userId: req.user?.id,
     );
   }
 }

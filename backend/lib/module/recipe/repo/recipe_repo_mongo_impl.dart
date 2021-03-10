@@ -54,8 +54,8 @@ class RecipeRepoMongoImpl implements RecipeRepo {
   }
 
   @override
-  Future<List<Recipe>> filterPublicRecipes(
-      {FilterOption filterOption, String userId, bool hasPermission}) async {
+  Future<List<Recipe>> filterRecipes(
+      {@required FilterOption filterOption, String userId, bool hasPermission}) async {
     var _pipeline = AggregationPipelineBuilder();
 
     if (filterOption.text != null) {
@@ -78,7 +78,7 @@ class RecipeRepoMongoImpl implements RecipeRepo {
 
     if (!hasPermission) {
       _pipeline = _pipeline.addStage(Match(Expr(Or(<dynamic>[
-        Eq(Field("author.id"), userId),
+        if (userId != null) Eq(Field("author.id"), userId),
         Eq(Field("publicVisible"), true),
       ]))));
     }

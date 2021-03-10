@@ -10,14 +10,6 @@ Future<bool> requirePermission(
   bool throwError = true,
 }) async {
   assert(req != null && res != null);
-  await requireAuthentication<User>().call(req, res);
-  final mongo = req.container.make<Db>();
-  if (mongo == null) {
-    throw "Database required for cheking permissions";
-  }
-  final user = req.container.make<User>();
-  final userAdminJson =
-      await mongo.collection("admins").findOne(where.eq("userId", user.id));
 
   bool _error([String message]) {
     if (throwError) {
@@ -26,6 +18,27 @@ Future<bool> requirePermission(
       return false;
     }
   }
+
+  // Check is there authorized user
+  bool _hasAuth;
+  try {
+    await requireAuthentication<User>().call(req, res);
+    _hasAuth = true;
+  } catch (e) {
+    _hasAuth = false;
+  }
+
+  if (!_hasAuth) {
+    return _error("Authorization required.");
+  }
+
+  final mongo = req.container.make<Db>();
+  if (mongo == null) {
+    throw "Database required for cheking permissions";
+  }
+  final user = req.container.make<User>();
+  final userAdminJson =
+      await mongo.collection("admins").findOne(where.eq("userId", user.id));
 
   if (userAdminJson != null) {
     final permissionJson = await mongo

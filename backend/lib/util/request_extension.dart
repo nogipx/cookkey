@@ -10,5 +10,11 @@ extension ExtRequestContext on RequestContext {
     return bodyAsMap;
   }
 
-  User get user => container.make<User>();
+  User get user {
+    try {
+      return container.make<User>();
+    } catch (e) {
+      return null;
+    }
+  }
 }

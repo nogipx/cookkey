@@ -26,8 +26,8 @@ class ApiError extends Equatable {
 
   @override
   String toString() => "ApiError ${statusCode.toString() ?? ''} "
-      "{ message: $message, translationKey: $translationKey }"
-      "${details != null && details.isNotEmpty ? '\n$details' : ''}";
+      "{ translationKey: $translationKey, message: $message }\n"
+      "${details != null && details.isNotEmpty ? '$details\n' : ''}";
 
   factory ApiError.badRequest({
     String message = '400 Bad Request',

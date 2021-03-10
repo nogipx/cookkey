@@ -1,11 +1,11 @@
 import 'dart:convert';
 
+import 'package:cookkey/util/response_processing.dart';
 import 'package:dio/dio.dart';
 import 'package:meta/meta.dart';
 import 'package:sdk/sdk.dart';
 
-import 'base_repo.dart';
-
+@sealed
 class RecipeRepoImpl with EasyRequest implements RecipeRepo {
   final Dio dio;
 
@@ -14,17 +14,9 @@ class RecipeRepoImpl with EasyRequest implements RecipeRepo {
   });
 
   @override
-  Future<Recipe> addTags(List<String> tagIds, String recipeId) async {
-    return request(
-      onResult: (dynamic json) => Recipe.fromJson(json as Map<String, dynamic>),
-      requestProvider: () => dio.get<Map>("/recipe/$recipeId/addTag/${tagIds.join(',')}"),
-    );
-  }
-
-  @override
   Future<Recipe> createRecipe(Recipe recipe) {
-    return request(
-      onResult: (dynamic json) => Recipe.fromJson(json as Map<String, dynamic>),
+    return request<Recipe, Map>(
+      onResult: (json) => Recipe.fromJson(json as Map<String, dynamic>),
       requestProvider: () => dio.post<Map>(
         "/recipe/create",
         data: jsonEncode(recipe.toJson()),
@@ -33,8 +25,17 @@ class RecipeRepoImpl with EasyRequest implements RecipeRepo {
   }
 
   @override
+  Future<Recipe> updateRecipe(Recipe recipe) {
+    return request<Recipe, Map>(
+      onResult: (json) => Recipe.fromJson(json as Map<String, dynamic>),
+      requestProvider: () =>
+          dio.put<List>("/recipe/update/${recipe.id}", data: jsonEncode(recipe.toJson())),
+    );
+  }
+
+  @override
   Future<void> deleteRecipeById(String recipeId) {
-    return request(
+    return request<void, void>(
       requestProvider: () => dio.delete<void>(
         "/recipe/create",
         data: jsonEncode(<String, dynamic>{"recipeId": recipeId}),
@@ -43,13 +44,13 @@ class RecipeRepoImpl with EasyRequest implements RecipeRepo {
   }
 
   @override
-  Future<List<Recipe>> filterPublicRecipes(
-      {FilterOption filterOption, String userId, bool hasPermission}) {
-    return request<List<Recipe>>(
-      onResult: (dynamic json) => (json as List)
-          .map((dynamic e) => Recipe.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      requestProvider: () => dio.get<dynamic>(
+  @protected
+  Future<List<Recipe>> filterRecipes(
+      {@required FilterOption filterOption, String userId, bool hasPermission}) {
+    return request<List<Recipe>, List>(
+      onResult: (json) =>
+          json.map((dynamic e) => Recipe.fromJson(e as Map<String, dynamic>)).toList(),
+      requestProvider: () => dio.get<List>(
         "/recipe/filter/${filterOption.toQuery()}",
       ),
     );
@@ -57,14 +58,23 @@ class RecipeRepoImpl with EasyRequest implements RecipeRepo {
 
   @override
   Future<Recipe> getRecipeById(String recipeId) {
-    // TODO: implement getRecipeById
-    throw UnimplementedError();
+    return request<Recipe, Map>(
+      onResult: (json) => Recipe.fromJson(json as Map<String, dynamic>),
+      requestProvider: () => dio.get<List>(
+        "/recipe/get/$recipeId",
+      ),
+    );
   }
 
   @override
   Future<List<Recipe>> getRecipesByIds(List<String> recipeIds) {
-    // TODO: implement getRecipesByIds
-    throw UnimplementedError();
+    return request<List<Recipe>, List>(
+      onResult: (json) =>
+          json.map((dynamic e) => Recipe.fromJson(e as Map<String, dynamic>)).toList(),
+      requestProvider: () => dio.get<List>(
+        "/recipe/get/many/${recipeIds.join(',')}",
+      ),
+    );
   }
 
   @override
@@ -80,26 +90,41 @@ class RecipeRepoImpl with EasyRequest implements RecipeRepo {
   }
 
   @override
-  Future<Recipe> publishRecipe(String recipeId) {
-    // TODO: implement publishRecipe
-    throw UnimplementedError();
+  Future<Recipe> addTags(List<String> tagIds, String recipeId) async {
+    return request<Recipe, Map>(
+      onResult: (json) => Recipe.fromJson(json as Map<String, dynamic>),
+      requestProvider: () => dio.get<Map>("/recipe/$recipeId/addTag/${tagIds.join(',')}"),
+    );
   }
 
   @override
   Future<Recipe> removeTags(List<String> tagIds, String recipeId) {
-    // TODO: implement removeTags
-    throw UnimplementedError();
+    return request<Recipe, Map>(
+      onResult: (json) => Recipe.fromJson(json as Map<String, dynamic>),
+      requestProvider: () => dio.put<List>(
+        "/recipe/$recipeId/removeTags/${tagIds.join(',')}",
+      ),
+    );
   }
 
   @override
+  Future<Recipe> publishRecipe(String recipeId) {
+    return request<Recipe, Map>(
+      onResult: (json) => Recipe.fromJson(json as Map<String, dynamic>),
+      requestProvider: () => dio.put<List>(
+        "/recipe/publish/$recipeId",
+      ),
+    );
+  }
+
+  @override
+  @protected
   Future<Recipe> unpublishRecipe(String recipeId) {
-    // TODO: implement unpublishRecipe
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Recipe> updateRecipe(Recipe recipe) {
-    // TODO: implement updateRecipe
-    throw UnimplementedError();
+    return request<Recipe, Map>(
+      onResult: (json) => Recipe.fromJson(json as Map<String, dynamic>),
+      requestProvider: () => dio.put<List>(
+        "/recipe/unpublish/$recipeId",
+      ),
+    );
   }
 }

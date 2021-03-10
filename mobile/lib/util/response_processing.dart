@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -8,9 +7,11 @@ import 'package:meta/meta.dart';
 import 'package:retry/retry.dart';
 
 mixin EasyRequest {
-  Future<T> request<T>({
+  /// [T] - Data return type.
+  /// [JT] - Json expected type, Map or List.
+  Future<T> request<T, JT>({
     @required final Future<Response> Function() requestProvider,
-    final T Function(dynamic json) onResult,
+    final T Function(JT json) onResult,
     final T Function(Response response) onRawResult,
     final T Function() onEmptyBody,
     final T Function() onCachedResponse,
@@ -28,7 +29,7 @@ mixin EasyRequest {
       onRetry: (Exception e) => onRetry?.call(),
     );
 
-    return response.process<T>(
+    return response.process<T, JT>(
       isRetryAllowed: isRetryAllowed,
       onResult: onResult,
       onRawResult: onRawResult,
@@ -39,9 +40,9 @@ mixin EasyRequest {
 }
 
 extension ResponseExt on Response {
-  Future<T> process<T>({
+  Future<T> process<T, JT>({
     bool isRetryAllowed = true,
-    T Function(dynamic json) onResult,
+    T Function(JT json) onResult,
     T Function(Response response) onRawResult,
     T Function() onEmptyBody,
     T Function() onCachedResponse,
@@ -61,9 +62,17 @@ extension ResponseExt on Response {
       T result;
 
       if (onRawResult != null) {
-        result = onRawResult.call(this);
+        result = onRawResult?.call(this);
+      } else if (data == null) {
+        result = onEmptyBody?.call();
       } else {
-        result = data != null ? onResult?.call(data) : onEmptyBody?.call();
+        if (data is! JT) {
+          throw ApiError.internalError(
+            message: "Received json type '${data.runtimeType}' is not expected '$JT'"
+                "\nRequest: ${request.path} \nResponse: $data\n",
+          );
+        }
+        result = onResult?.call(data as JT);
       }
 
       if (result is Future) {

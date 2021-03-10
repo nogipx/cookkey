@@ -17,8 +17,9 @@ class RecipeRepoMongoImpl implements RecipeRepo {
   }) : assert(mongo != null && recipeCollection != null);
 
   @override
-  Future<void> createRecipe(Recipe recipe) async {
+  Future<Recipe> createRecipe(Recipe recipe) async {
     await mongo.collection(recipeCollection).insert(recipe.toJson());
+    return recipe;
   }
 
   @override
@@ -27,10 +28,11 @@ class RecipeRepoMongoImpl implements RecipeRepo {
   }
 
   @override
-  Future<void> updateRecipe(Recipe recipe) async {
+  Future<Recipe> updateRecipe(Recipe recipe) async {
     await mongo
         .collection(recipeCollection)
         .update(where.eq("id", recipe.id), recipe.toJson());
+    return recipe;
   }
 
   @override
@@ -52,7 +54,7 @@ class RecipeRepoMongoImpl implements RecipeRepo {
   }
 
   @override
-  Future filterPublicRecipes(
+  Future<List<Recipe>> filterPublicRecipes(
       {FilterOption filterOption, String userId, bool hasPermission}) async {
     var _pipeline = AggregationPipelineBuilder();
 

@@ -16,13 +16,17 @@ dependencies:
     path: ../packages/convenient_bloc
   sdk:
     path: ../sdk
+  cupertino_icons: ^1.0.2
 
   uuid: ^2.2.0
   equatable: ^1.0.0
   json_annotation: ^3.1.0
   json_serializable: ^3.5.0
+  
+  # Network
+  dio: ^3.0.10
+  retry: ^3.1.0
 
-  cupertino_icons: ^1.0.2
 
 dev_dependencies:
   flutter_test:

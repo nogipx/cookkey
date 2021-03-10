@@ -17,7 +17,7 @@ class _DependencyInjectorState extends State<DependencyInjector> {
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
-      providers: [],
+      providers: [RepositoryProvider.value(value: "value")],
       child: widget.child,
     );
   }

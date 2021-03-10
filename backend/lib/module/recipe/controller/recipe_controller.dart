@@ -173,7 +173,8 @@ class RecipeController extends Controller with AppPermission {
   /// Users with permission will see all recipes by filter.
   /// Users without permission will see only public and their recipes.
   @Expose("/filter/:query", method: "GET")
-  Future filter(RequestContext req, ResponseContext res, String query) async {
+  Future<List<Recipe>> filter(
+      RequestContext req, ResponseContext res, String query) async {
     final filterOption = FilterOption.parse(query);
     final hasPermission = await requirePermission(req, res,
         permission: AppPermission.editOtherUserRecipePermission, throwError: false);

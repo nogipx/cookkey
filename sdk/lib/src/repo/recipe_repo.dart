@@ -1,13 +1,13 @@
 import 'package:sdk/domain.dart';
 
 abstract class RecipeRepo {
-  Future<void> createRecipe(Recipe recipe);
+  Future<Recipe> createRecipe(Recipe recipe);
 
-  Future<void> updateRecipe(Recipe recipe);
+  Future<Recipe> updateRecipe(Recipe recipe);
 
   Future<void> deleteRecipeById(String recipeId);
 
-  Future filterPublicRecipes(
+  Future<List<Recipe>> filterPublicRecipes(
       {FilterOption filterOption, String userId, bool hasPermission});
 
   Future<List<Recipe>> getRecipesByUserId(String userId);
@@ -20,9 +20,9 @@ abstract class RecipeRepo {
 
   Future<Recipe> unpublishRecipe(String recipeId);
 
-  Future<Recipe> addTags(List<String> tags, String id);
+  Future<Recipe> addTags(List<String> tagIds, String recipeId);
 
-  Future<Recipe> removeTags(List<String> tags, String recipeId);
+  Future<Recipe> removeTags(List<String> tagIds, String recipeId);
 
   Future<List<RecipeTag>> getTagsByRecipeId(String recipeId);
 }

@@ -41,5 +41,9 @@ class ServerConfig {
     }
   }
 
-  Uri get origin => Uri.parse('$protocol://${useIp ? host : domain}:$port');
+  Uri get origin =>
+      Uri.parse('$protocol://${useIp || domain.isEmpty ? host : domain}:$port');
+
+  @override
+  String toString() => origin.toString();
 }

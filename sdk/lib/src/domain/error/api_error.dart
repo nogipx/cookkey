@@ -24,6 +24,11 @@ class ApiError extends Equatable {
   factory ApiError.fromJson(Map<String, dynamic> json) => _$ApiErrorFromJson(json);
   Map<String, dynamic> toJson() => _$ApiErrorToJson(this);
 
+  @override
+  String toString() => "ApiError ${statusCode.toString() ?? ''} "
+      "{ message: $message, translationKey: $translationKey }"
+      "${details != null && details.isNotEmpty ? '\n$details' : ''}";
+
   factory ApiError.badRequest({
     String message = '400 Bad Request',
     String translationKey,
@@ -175,6 +180,19 @@ class ApiError extends Equatable {
       ApiError(
         message: message,
         statusCode: 503,
+        translationKey: translationKey,
+        details: details,
+      );
+
+  /// Throws a 500 Internal Error error.
+  factory ApiError.internalError({
+    String message = '500 Internal Error',
+    String translationKey,
+    List<String> details,
+  }) =>
+      ApiError(
+        message: message,
+        statusCode: 500,
         translationKey: translationKey,
         details: details,
       );

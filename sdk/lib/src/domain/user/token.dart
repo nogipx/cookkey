@@ -1,5 +1,5 @@
 abstract class TokenProvider {
-  String get token;
+  Future<String> get token;
 
   void setToken(String token);
 }

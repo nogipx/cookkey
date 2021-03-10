@@ -37,15 +37,6 @@ class Recipe {
   factory Recipe.fromJson(Map<String, dynamic> json) => _$RecipeFromJson(json);
   Map<String, dynamic> toJson() => _$RecipeToJson(this);
 
-  Map<String, dynamic> toJsonSimplifyTags() {
-    final json = _$RecipeToJson(this);
-    final simplified = (json["recipeTags"] as List<Map<String, dynamic>>)
-        .map((e) => <String, dynamic>{"id": e["id"]})
-        .toList();
-    json["recipeTags"] = simplified;
-    return json;
-  }
-
   static Validator get isValidCreate {
     return Validator(<String, dynamic>{
       "title*": [isNonEmptyString],

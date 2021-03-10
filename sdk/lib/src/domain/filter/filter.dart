@@ -13,15 +13,15 @@ class FilterOption extends Equatable {
   });
 
   String toQuery() {
-    String _query = "";
+    final _params = <String>[];
     if (text != null) {
-      _query = "text=$text&";
+      _params.add("text=$text");
     }
     if (tags != null && tags.isNotEmpty) {
-      _query = "${_query}tags=${tags.join(',')}&";
+      _params.add("tags=${tags.join(',')}");
     }
 
-    return _query.trim();
+    return _params.join("&");
   }
 
   factory FilterOption.parse(String input) {

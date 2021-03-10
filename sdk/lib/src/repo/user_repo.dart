@@ -1,5 +1,4 @@
 import 'package:sdk/domain.dart';
-import 'package:meta/meta.dart';
 
 abstract class UserRepo {
   Future<User> getUserById(String id);

@@ -5,11 +5,11 @@ abstract class TagRepo {
 
   Future<RecipeTag> updateTag(RecipeTag tag);
 
-  Future<void> deleteTagById(String id);
+  Future<void> deleteTagById(String tagId);
 
-  Future<List<RecipeTag>> getTagsByIds(List<String> ids);
+  Future<List<RecipeTag>> getTagsByIds(List<String> tagIds);
 
-  Future<RecipeTag> getTagById(String id);
+  Future<RecipeTag> getTagById(String tagId);
 
   Future<List<RecipeTag>> getTagsByCategoryId(String categoryId);
 

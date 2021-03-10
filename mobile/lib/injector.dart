@@ -1,4 +1,3 @@
-import 'package:sdk/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -18,14 +17,7 @@ class _DependencyInjectorState extends State<DependencyInjector> {
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider<FilterService>(
-          create: (_) => TestFilterServiceImpl(),
-        ),
-        RepositoryProvider<RecipeService>(
-          create: (_) => TestRecipeServiceImpl(),
-        ),
-      ],
+      providers: [],
       child: widget.child,
     );
   }

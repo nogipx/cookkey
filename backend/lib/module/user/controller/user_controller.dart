@@ -5,6 +5,7 @@ import 'package:backend/module/user/export.dart';
 import 'package:backend/util/permission.dart';
 import 'package:meta/meta.dart';
 import 'package:sdk/domain.dart';
+import 'package:sdk/sdk.dart';
 
 @Expose("/user")
 class UserController extends Controller {

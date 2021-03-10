@@ -11,5 +11,5 @@ abstract class UserRepo {
     String password,
   });
 
-  Future<UserPermission> getPermission({@required String userId});
+  Future<UserPermission> getPermission(String userId);
 }

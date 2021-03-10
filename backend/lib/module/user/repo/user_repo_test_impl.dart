@@ -1,5 +1,5 @@
-import 'package:backend/module/user/repo/export.dart';
 import 'package:sdk/domain.dart';
+import 'package:sdk/sdk.dart';
 
 class ImplTestUserRepo implements UserRepo {
   @override
@@ -36,7 +36,7 @@ class ImplTestUserRepo implements UserRepo {
   }
 
   @override
-  Future<UserPermission> getPermission({String userId}) {
+  Future<UserPermission> getPermission(String userId) {
     // TODO: implement getPermission
     throw UnimplementedError();
   }

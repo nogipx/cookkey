@@ -1,9 +1,9 @@
 import 'package:angel_auth/angel_auth.dart';
 import 'package:angel_framework/angel_framework.dart';
 import 'package:backend/config.dart';
-import 'package:backend/module/user/export.dart';
 import 'package:sdk/domain.dart';
 import 'package:meta/meta.dart';
+import 'package:sdk/sdk.dart';
 
 Future<AngelAuth> configureAuth({
   @required Angel app,

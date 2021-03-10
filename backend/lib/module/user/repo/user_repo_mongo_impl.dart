@@ -3,6 +3,7 @@ import 'package:sdk/domain.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:meta/meta.dart';
 import 'package:backend/util/export.dart';
+import 'package:sdk/sdk.dart';
 
 class UserRepoMongoImpl implements UserRepo {
   final Db mongo;
@@ -59,9 +60,7 @@ class UserRepoMongoImpl implements UserRepo {
   }
 
   @override
-  Future<UserPermission> getPermission({
-    @required String userId,
-  }) async {
+  Future<UserPermission> getPermission(String userId) async {
     final userAdminJson =
         await mongo.collection("admins").findOne(where.eq("userId", userId));
 

@@ -1,0 +1,36 @@
+{
+  "folders": [
+    {
+      "path": "./backend"
+    },
+    {
+      "path": "./sdk"
+    },
+    {
+      "path": "./packages"
+    },
+  ],
+  "launch": {
+    "configurations": [
+      {
+        "name": "Run Backend",
+        "type": "dart",
+        "request": "launch",
+        "program": "${workspaceFolder:backend}/lib/main.dart",
+        "vmAdditionalArgs": [
+          "--enable-vm-service"
+        ]
+      },
+    ],
+    "compounds": []
+  },
+  "settings": {
+    "dart.lineLength": 90,
+    "[dart]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "Dart-Code.dart-code",
+      "editor.wordWrapColumn": 90,
+      "editor.rulers": [90],
+    },
+  }
+}

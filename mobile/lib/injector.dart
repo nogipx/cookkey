@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cookkey/bloc/auth_bloc.dart';
 import 'package:cookkey/repo/export.dart';
 import 'package:cookkey/repo/tag_repo.dart';
 import 'package:cookkey/store/token_store.dart';
@@ -26,23 +27,27 @@ class DependencyInjector extends StatefulWidget {
 }
 
 class _DependencyInjectorState extends State<DependencyInjector> {
-  SharedPrefStore _sharedPrefStore;
+  AppSharedStore _sharedStore;
   RecipeRepo _recipeRepo;
   AuthRepo _authRepo;
   UserRepo _userRepo;
   TagRepo _tagRepo;
 
+  AuthBloc _authBloc;
+
   @override
   void initState() {
-    _sharedPrefStore = SharedPrefStore(widget.sharedPreferences);
+    _sharedStore = AppSharedStore(widget.sharedPreferences);
 
     final dio = Dio(BaseOptions(baseUrl: widget.server.toString()));
-    dio.interceptors.add(getDioInterceptor(() => _sharedPrefStore.token));
+    dio.interceptors.add(getDioInterceptor(() => _sharedStore.token));
 
     _recipeRepo = RecipeRepoImpl(dio: dio);
     _authRepo = AuthRepo(dio: dio);
     _userRepo = UserRepoImpl(dio: dio);
     _tagRepo = TagRepoImpl(dio: dio);
+
+    _authBloc = AuthBloc(authRepo: _authRepo, sharedStore: _sharedStore);
 
     super.initState();
   }
@@ -51,13 +56,18 @@ class _DependencyInjectorState extends State<DependencyInjector> {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider.value(value: _sharedPrefStore),
+        RepositoryProvider.value(value: _sharedStore),
         RepositoryProvider.value(value: _authRepo),
         RepositoryProvider.value(value: _recipeRepo),
         RepositoryProvider.value(value: _userRepo),
         RepositoryProvider.value(value: _tagRepo),
       ],
-      child: widget.child,
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider.value(value: _authBloc),
+        ],
+        child: widget.child,
+      ),
     );
   }
 

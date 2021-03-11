@@ -5,13 +5,13 @@ import 'package:meta/meta.dart';
 part 'api_error.g.dart';
 
 @JsonSerializable()
-class ApiError extends Equatable {
+class ApiError extends Error with EquatableMixin {
   final int statusCode;
   final String message;
   final String translationKey;
   final List<String> details;
 
-  const ApiError({
+  ApiError({
     @required this.statusCode,
     @required this.message,
     this.translationKey,

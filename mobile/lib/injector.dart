@@ -1,12 +1,17 @@
 import 'dart:io';
 
 import 'package:cookkey/bloc/auth_bloc.dart';
+import 'package:cookkey/cookkey_route.dart';
 import 'package:cookkey/repo/export.dart';
 import 'package:cookkey/repo/tag_repo.dart';
+import 'package:cookkey/route/export.dart';
+import 'package:cookkey/screen/test_page.dart';
+import 'package:cookkey/screen/test_page2.dart';
 import 'package:cookkey/store/token_store.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:sdk/sdk.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -32,6 +37,7 @@ class _DependencyInjectorState extends State<DependencyInjector> {
   AuthRepo _authRepo;
   UserRepo _userRepo;
   TagRepo _tagRepo;
+  RouteManager _routeManager;
 
   AuthBloc _authBloc;
 
@@ -49,24 +55,37 @@ class _DependencyInjectorState extends State<DependencyInjector> {
 
     _authBloc = AuthBloc(authRepo: _authRepo, sharedStore: _sharedStore);
 
+    _routeManager = RouteManager(
+      unknownRoute: () => Container(color: Colors.blue),
+      mapRoute: {
+        CookkeyRoute.mainPage: () => TestPage2(),
+        CookkeyRoute.search: () => Scaffold(body: Container(color: Colors.yellow)),
+      },
+    );
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MultiRepositoryProvider(
+    return MultiProvider(
       providers: [
-        RepositoryProvider.value(value: _sharedStore),
-        RepositoryProvider.value(value: _authRepo),
-        RepositoryProvider.value(value: _recipeRepo),
-        RepositoryProvider.value(value: _userRepo),
-        RepositoryProvider.value(value: _tagRepo),
+        ChangeNotifierProvider.value(value: _routeManager),
       ],
-      child: MultiBlocProvider(
+      child: MultiRepositoryProvider(
         providers: [
-          BlocProvider.value(value: _authBloc),
+          RepositoryProvider.value(value: _sharedStore),
+          RepositoryProvider.value(value: _authRepo),
+          RepositoryProvider.value(value: _recipeRepo),
+          RepositoryProvider.value(value: _userRepo),
+          RepositoryProvider.value(value: _tagRepo),
         ],
-        child: widget.child,
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: _authBloc),
+          ],
+          child: widget.child,
+        ),
       ),
     );
   }
@@ -88,7 +107,7 @@ class _DependencyInjectorState extends State<DependencyInjector> {
           final _data = e.response.data as Map<String, dynamic>;
           throw ApiError.fromJson(_data);
         } else {
-          throw ApiError(
+          return ApiError(
             statusCode: null,
             message: e.error.toString(),
           );

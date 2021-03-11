@@ -20,9 +20,10 @@ class AppRoute extends Equatable {
       AppRoute(template, actualUri: actualUri ?? this.actualUri, data: data);
 
   AppRoute fill({Map<String, dynamic> data}) {
+    final _data = data ?? <String, dynamic>{};
     return copyWith(
-      actualUri: UriParser(uriTemplate).expand(data ?? {}),
-      data: data,
+      actualUri: UriParser(uriTemplate).expand(_data),
+      data: _data,
     );
   }
 

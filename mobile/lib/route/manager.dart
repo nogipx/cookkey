@@ -2,12 +2,17 @@ import 'dart:developer' as dev;
 
 import 'package:cookkey/route/export.dart';
 import 'package:flutter/material.dart';
+import 'package:uri/uri.dart';
 
 class RouteManager with ChangeNotifier {
   final AppRoute initialRoute;
   final AppRoute Function(AppRoute route) onUnknownRoute;
   final Map<AppRoute, Widget Function(Map<String, dynamic> data)> mapRoute;
   final Widget Function(RouteManager manager, AppRoute route, Widget page) pageWrapper;
+
+  final Function(RouteManager, AppRoute) onPushRoute;
+  final Function(RouteManager, AppRoute) onRemoveRoute;
+  final bool Function(RouteManager, AppRoute) onDoublePushRoute;
 
   List<Page> _pages;
   List<Page> get pages => List.unmodifiable(_pages);
@@ -17,6 +22,9 @@ class RouteManager with ChangeNotifier {
     @required this.mapRoute,
     @required this.onUnknownRoute,
     this.pageWrapper,
+    this.onPushRoute,
+    this.onRemoveRoute,
+    this.onDoublePushRoute,
   }) : assert(mapRoute != null && onUnknownRoute != null && initialRoute != null) {
     _pages = [
       MaterialPage<dynamic>(
@@ -27,20 +35,50 @@ class RouteManager with ChangeNotifier {
     ];
   }
 
+  AppRoute get currentRoute {
+    final currentPath = Uri.parse(pages.last.name);
+    final route = mapRoute.keys.firstWhere((route) {
+      return UriParser(route.uriTemplate).matches(currentPath) ?? false;
+    });
+    return route.fill();
+  }
+
   void removeRoute(Page page, dynamic result) {
     _pages.remove(page);
+    try {
+      onRemoveRoute?.call(this, currentRoute);
+    } catch (e) {
+      _pages.add(page);
+      throw Exception("Remove route aborted. \n$e");
+    }
     notifyListeners();
   }
 
   void pushRoute(AppRoute route, {Map<String, dynamic> data}) {
     final _filledRoute = route.fill(data: data);
     final _actualUri = _filledRoute.actualUri.toString();
+
+    if (_filledRoute == currentRoute) {
+      final _allow = onDoublePushRoute?.call(this, _filledRoute) ?? false;
+      if (!_allow) {
+        return;
+      }
+    }
+
     final page = MaterialPage<dynamic>(
       key: ValueKey(_actualUri),
       child: getPageBuilder(_filledRoute).call(data),
       name: _actualUri,
     );
     _pages.add(page);
+
+    try {
+      onPushRoute?.call(this, _filledRoute);
+    } catch (e) {
+      _pages.remove(page);
+      throw Exception("Push route aborted. \n$e");
+    }
+
     notifyListeners();
   }
 
@@ -56,7 +94,9 @@ class RouteManager with ChangeNotifier {
       _pageBuilder = mapRoute[_unknownRoute];
 
       if (_pageBuilder == null) {
-        throw Exception("Push aborted. No page builder for 'unknown' $_unknownRoute");
+        throw Exception(
+          "Push route aborted. No page builder for 'unknown' $_unknownRoute",
+        );
       }
     }
 

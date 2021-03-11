@@ -2,44 +2,45 @@ import 'package:cookkey/route/export.dart';
 import 'package:flutter/material.dart';
 
 class RouteManager with ChangeNotifier {
+  final AppRoute initialRoute;
   final Widget Function() unknownRoute;
   final Map<AppRoute, Widget Function()> mapRoute;
 
   static Widget rootScreen;
+  List<Page> _pages;
 
   RouteManager({
+    @required this.initialRoute,
     @required this.mapRoute,
     @required this.unknownRoute,
-  }) : assert(mapRoute != null && unknownRoute != null);
-
-  List<Page> get pages => List.unmodifiable(_pages);
-  final List<Page> _pages = [
-    if (rootScreen != null)
+  }) : assert(mapRoute != null && unknownRoute != null && initialRoute != null) {
+    _pages = [
       MaterialPage<dynamic>(
         key: ValueKey("/"),
-        child: rootScreen ?? Scaffold(),
+        child: getPage(initialRoute).call(),
         name: "/",
       )
-  ];
+    ];
+  }
+
+  List<Page> get pages => List.unmodifiable(_pages);
 
   void removeRoute(Route<dynamic> route, dynamic result) {
     _pages.removeWhere((e) => e.name == route.settings.name);
     notifyListeners();
   }
 
-  void addRoute(AppRoute route) {
+  void pushRoute(AppRoute route) {
     final page = MaterialPage<dynamic>(
       key: ValueKey(route.actualUri),
-      child: getScreen(route).call(),
+      child: getPage(route).call(),
       name: route.actualUri.toString(),
     );
     _pages.add(page);
     notifyListeners();
   }
 
-  Widget Function() getScreen(AppRoute route) {
-    return mapRoute[route] ?? unknownRoute;
-  }
+  Widget Function() getPage(AppRoute route) => mapRoute[route] ?? unknownRoute;
 }
 
 class MyPage extends Page<dynamic> {

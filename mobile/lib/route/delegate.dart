@@ -35,7 +35,7 @@ class AppRouteDelegate extends RouterDelegate<AppRoute>
 
   @override
   Future<void> setNewRoutePath(AppRoute configuration) async =>
-      routeManager.addRoute(configuration);
+      routeManager.pushRoute(configuration);
 
   @override
   GlobalKey<NavigatorState> get navigatorKey => _navigatorKey;

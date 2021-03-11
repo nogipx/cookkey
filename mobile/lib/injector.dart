@@ -56,6 +56,7 @@ class _DependencyInjectorState extends State<DependencyInjector> {
     _authBloc = AuthBloc(authRepo: _authRepo, sharedStore: _sharedStore);
 
     _routeManager = RouteManager(
+      initialRoute: CookkeyRoute.mainPage,
       unknownRoute: () => Container(color: Colors.blue),
       mapRoute: {
         CookkeyRoute.mainPage: () => TestPage2(),

@@ -8,18 +8,28 @@ class AppRoute extends Equatable {
   UriTemplate _uriTemplate;
   UriTemplate get uriTemplate => _uriTemplate;
 
+  final Map<String, dynamic> data;
+
   final Uri actualUri;
 
-  AppRoute(this.template, {this.actualUri}) {
+  AppRoute(this.template, {this.actualUri, this.data}) {
     _uriTemplate = UriTemplate(template);
   }
 
-  AppRoute copyWith({Uri actualUri}) {
-    return AppRoute(template, actualUri: actualUri ?? this.actualUri);
-  }
+  AppRoute copyWith({Uri actualUri, Map<String, dynamic> data}) =>
+      AppRoute(template, actualUri: actualUri ?? this.actualUri, data: data);
 
-  Uri fill(Map<String, dynamic> data) => UriParser(uriTemplate).expand(data);
+  AppRoute fill({Map<String, dynamic> data}) {
+    return copyWith(
+      actualUri: UriParser(uriTemplate).expand(data ?? {}),
+      data: data,
+    );
+  }
 
   @override
   List<Object> get props => [template];
+
+  @override
+  String toString() =>
+      "AppRoute { template: $template, actualUri: $actualUri, data: $data }";
 }

@@ -25,7 +25,9 @@ class AppRouteDelegate extends RouterDelegate<AppRoute>
             if (!didPop) {
               return false;
             }
-            routeManager.removeRoute(route, result);
+            if (route.settings is MaterialPage) {
+              routeManager.removeRoute(route.settings as MaterialPage, result);
+            }
             return true;
           },
         );

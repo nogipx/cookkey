@@ -15,9 +15,12 @@ dependencies:
   provider: ^4.3.3
   dartx: ^0.5.0
   uri: ^0.11.4
+
   page_transition: "^1.1.7+6"
   convenient_bloc:
     path: ../packages/convenient_bloc
+  navigation_manager:
+    path: ../packages/navigation_manager
   sdk:
     path: ../sdk
   cupertino_icons: ^1.0.2

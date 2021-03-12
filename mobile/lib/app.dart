@@ -1,7 +1,5 @@
-import 'package:cookkey/route/delegate.dart';
-import 'package:cookkey/route/export.dart';
-import 'package:cookkey/route/manager.dart';
-import 'package:cookkey/route/parser.dart';
+import 'package:cookkey/cookkey_route.dart';
+import 'package:navigation_manager/navigation_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -19,7 +17,10 @@ class CookkeyMobileApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
-          routeInformationParser: AppRouteInformationParser(),
+          routeInformationParser: AppRouteInformationParser(
+            routes: CookkeyRoute.routes,
+            unknownRoute: CookkeyRoute.unknown,
+          ),
           routerDelegate: AppRouteDelegate(
             routeManager: manager,
           ),

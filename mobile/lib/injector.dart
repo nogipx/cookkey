@@ -4,10 +4,10 @@ import 'package:cookkey/bloc/auth_bloc.dart';
 import 'package:cookkey/cookkey_route.dart';
 import 'package:cookkey/repo/export.dart';
 import 'package:cookkey/repo/tag_repo.dart';
-import 'package:cookkey/route/export.dart';
-import 'package:cookkey/screen/test_page.dart';
-import 'package:cookkey/screen/test_page2.dart';
+import 'package:cookkey/page/export.dart';
 import 'package:cookkey/store/token_store.dart';
+import 'package:cookkey/widget/app_bottom_navigation.dart';
+import 'package:navigation_manager/navigation_manager.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -55,12 +55,36 @@ class _DependencyInjectorState extends State<DependencyInjector> {
 
     _authBloc = AuthBloc(authRepo: _authRepo, sharedStore: _sharedStore);
 
+    final bottomNavigationRoutes = [CookkeyRoute.dashboard, CookkeyRoute.search];
+
     _routeManager = RouteManager(
-      initialRoute: CookkeyRoute.mainPage,
-      unknownRoute: () => Container(color: Colors.blue),
+      initialRoute: CookkeyRoute.dashboard,
+      onUnknownRoute: (data) => CookkeyRoute.unknown,
       mapRoute: {
-        CookkeyRoute.mainPage: () => TestPage2(),
-        CookkeyRoute.search: () => Scaffold(body: Container(color: Colors.yellow)),
+        CookkeyRoute.dashboard: (_) => DashboardPage(),
+        CookkeyRoute.search: (_) => SearchPage(),
+        CookkeyRoute.profile: (_) => ProfilePage(),
+        // CookkeyRoute.unknown: (_) => Container(color: Colors.red),
+      },
+      pageWrapper: (manager, route, page) {
+        if (bottomNavigationRoutes.contains(route)) {
+          return AppBottomNavigation(routeManager: manager, child: page);
+        } else {
+          return page;
+        }
+      },
+      onPushRoute: (manager, route) {
+        print("PUSH $route, Stack Count: ${manager.pages.length}");
+      },
+      onRemoveRoute: (manager, route) {
+        print("REMOVE $route, Stack Count: ${manager.pages.length}");
+      },
+      onDoublePushRoute: (manager, route) {
+        print("DOUBLE $route, Stack Count: ${manager.pages.length}");
+        return false;
+      },
+      onExit: (manager, route) {
+        print("EXIT");
       },
     );
 

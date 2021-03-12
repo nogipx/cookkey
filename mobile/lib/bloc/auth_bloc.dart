@@ -6,10 +6,14 @@ import 'package:meta/meta.dart';
 
 class AuthBloc extends BaseBloc<AuthEvent, AuthState> {
   final AuthRepo authRepo;
+  final UserRepo userRepo;
   final AppSharedStore sharedStore;
+
+  Auth _auth;
 
   AuthBloc({
     @required this.authRepo,
+    @required this.userRepo,
     @required this.sharedStore,
   }) : super(null);
 
@@ -18,14 +22,38 @@ class AuthBloc extends BaseBloc<AuthEvent, AuthState> {
 
   @override
   void mapEvents() {
+    mapEvent<AuthRestore>(_mapRestore);
     mapEvent<AuthLocalLoggedIn>(_mapLocalLogin);
     mapEvent<AuthLoggedOut>(_mapLogout);
+  }
+
+  void restoreLogin() {
+    if (_auth != null) {
+      add(AuthRestore(_auth));
+    } else {
+      final token = sharedStore.token;
+      final user = sharedStore.user;
+      if (token != null && user != null) {
+        add(AuthRestore(Auth(token: token, user: user)));
+      }
+    }
+  }
+
+  void loginPassword(String username, String password) =>
+      add(AuthLocalLoggedIn(AuthCredentials(username, password)));
+
+  void logout() => add(AuthLoggedOut());
+
+  Stream<AuthState> _mapRestore(AuthRestore event) async* {
+    yield AuthSuccessLogin(event.auth);
   }
 
   Stream<AuthState> _mapLocalLogin(AuthLocalLoggedIn event) async* {
     yield AuthProcess();
     final auth = await authRepo.login(event.credentials);
     await sharedStore.saveToken(auth.token);
+    await sharedStore.saveUser(auth.user);
+    _auth = auth;
     yield AuthSuccessLogin(auth);
   }
 
@@ -33,12 +61,20 @@ class AuthBloc extends BaseBloc<AuthEvent, AuthState> {
     yield AuthProcess();
     await authRepo.logout();
     await sharedStore.removeToken();
+    await sharedStore.clearUser();
+    _auth = null;
     yield AuthSuccessLogout();
   }
 }
 
 abstract class AuthEvent {
   const AuthEvent();
+}
+
+class AuthRestore extends AuthEvent {
+  final Auth auth;
+
+  const AuthRestore(this.auth);
 }
 
 class AuthLocalLoggedIn extends AuthEvent {

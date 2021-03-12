@@ -27,7 +27,15 @@
       "editor.formatOnSave": true,
       "editor.defaultFormatter": "Dart-Code.dart-code",
       "editor.wordWrapColumn": 90,
-      "editor.rulers": [90],
+      "editor.rulers": [
+        90
+      ],
     },
+    "editor.formatOnSave": true,
+  },
+  "extensions": {
+    "recommendations": [
+      "ivanhofer.git-assistant"
+    ]
   }
 }

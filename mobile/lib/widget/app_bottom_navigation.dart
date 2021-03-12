@@ -1,4 +1,4 @@
-import 'package:cookkey/cookkey_route.dart';
+import 'package:cookkey/routes.dart';
 import 'package:navigation_manager/navigation_manager.dart';
 
 import 'package:flutter/material.dart';
@@ -12,7 +12,7 @@ class AppBottomNavigation extends StatefulWidget {
     Key key,
     @required this.routeManager,
     @required this.child,
-    this.height = 80,
+    this.height = 56,
   }) : super(key: key);
 
   @override

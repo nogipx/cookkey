@@ -17,7 +17,7 @@ class AuthRepo with EasyRequest {
 
   Future<void> logout() {
     return request<void, void>(
-      requestProvider: () => dio.get<Map>("/auth/logout"),
+      requestProvider: () => dio.post<void>("/auth/logout"),
     );
   }
 }

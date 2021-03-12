@@ -1,12 +1,12 @@
-import 'dart:io';
+import 'dart:io' show HttpHeaders;
 
 import 'package:cookkey/bloc/auth_bloc.dart';
-import 'package:cookkey/cookkey_route.dart';
-import 'package:cookkey/repo/export.dart';
-import 'package:cookkey/repo/tag_repo.dart';
+import 'package:cookkey/bloc/scaffold_feedback.dart';
+import 'package:cookkey/routes.dart';
+import 'package:cookkey/page/wrapper/auth_require_wrapper.dart';
 import 'package:cookkey/page/export.dart';
+import 'package:cookkey/repo/export.dart';
 import 'package:cookkey/store/token_store.dart';
-import 'package:cookkey/widget/app_bottom_navigation.dart';
 import 'package:navigation_manager/navigation_manager.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +40,17 @@ class _DependencyInjectorState extends State<DependencyInjector> {
   RouteManager _routeManager;
 
   AuthBloc _authBloc;
+  FeedbackBloc _feedbackBloc;
+
+  Map<AppRoute, Widget Function(Map<String, dynamic>)> get appRoutes {
+    return {
+      CookkeyRoute.login: (_) => LoginPage(authBloc: _authBloc),
+      CookkeyRoute.dashboard: (_) => DashboardPage(),
+      CookkeyRoute.search: (_) => SearchPage(),
+      CookkeyRoute.profile: (_) => ProfilePage(authBloc: _authBloc),
+      CookkeyRoute.unknown: (_) => Container(color: Colors.red),
+    };
+  }
 
   @override
   void initState() {
@@ -53,25 +64,34 @@ class _DependencyInjectorState extends State<DependencyInjector> {
     _userRepo = UserRepoImpl(dio: dio);
     _tagRepo = TagRepoImpl(dio: dio);
 
-    _authBloc = AuthBloc(authRepo: _authRepo, sharedStore: _sharedStore);
-
-    final bottomNavigationRoutes = [CookkeyRoute.dashboard, CookkeyRoute.search];
+    _feedbackBloc = FeedbackBloc();
+    _authBloc = AuthBloc(
+      authRepo: _authRepo,
+      userRepo: _userRepo,
+      sharedStore: _sharedStore,
+    );
 
     _routeManager = RouteManager(
       initialRoute: CookkeyRoute.dashboard,
-      onUnknownRoute: (data) => CookkeyRoute.unknown,
-      mapRoute: {
-        CookkeyRoute.dashboard: (_) => DashboardPage(),
-        CookkeyRoute.search: (_) => SearchPage(),
-        CookkeyRoute.profile: (_) => ProfilePage(),
-        // CookkeyRoute.unknown: (_) => Container(color: Colors.red),
-      },
+      onUnknownRoute: (route) => CookkeyRoute.unknown,
+      mapRoute: appRoutes,
       pageWrapper: (manager, route, page) {
-        if (bottomNavigationRoutes.contains(route)) {
-          return AppBottomNavigation(routeManager: manager, child: page);
-        } else {
-          return page;
-        }
+        _authBloc.restoreLogin();
+        return BottomNavigationWrapper(
+          currentRoute: route,
+          routeManager: manager,
+          bottomNavigationRoutes: [
+            CookkeyRoute.search,
+            CookkeyRoute.dashboard,
+            CookkeyRoute.profile,
+            CookkeyRoute.unknown,
+          ],
+          child: AuthRequireWrapper(
+            currentRoute: route,
+            authRoutes: [CookkeyRoute.profile],
+            child: page,
+          ),
+        );
       },
       onPushRoute: (manager, route) {
         print("PUSH $route, Stack Count: ${manager.pages.length}");
@@ -82,9 +102,6 @@ class _DependencyInjectorState extends State<DependencyInjector> {
       onDoublePushRoute: (manager, route) {
         print("DOUBLE $route, Stack Count: ${manager.pages.length}");
         return false;
-      },
-      onExit: (manager, route) {
-        print("EXIT");
       },
     );
 
@@ -108,6 +125,7 @@ class _DependencyInjectorState extends State<DependencyInjector> {
         child: MultiBlocProvider(
           providers: [
             BlocProvider.value(value: _authBloc),
+            BlocProvider.value(value: _feedbackBloc),
           ],
           child: widget.child,
         ),

@@ -470,7 +470,7 @@ packages:
       path: "../packages/navigation_manager"
       relative: true
     source: path
-    version: "0.0.2"
+    version: "0.0.3"
   nested:
     dependency: transitive
     description:

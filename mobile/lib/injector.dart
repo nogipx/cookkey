@@ -103,6 +103,14 @@ class _DependencyInjectorState extends State<DependencyInjector> {
         print("DOUBLE $route, Stack Count: ${manager.pages.length}");
         return false;
       },
+      transitionDuration: const Duration(milliseconds: 500),
+      reverseTransitionDuration: const Duration(milliseconds: 300),
+      transitionProvider: (child, animation, animtation2) {
+        return FadeTransition(
+          opacity: animation,
+          child: child,
+        );
+      },
     );
 
     super.initState();

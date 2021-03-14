@@ -10,6 +10,10 @@ class AuthBloc extends BaseBloc<AuthEvent, AuthState> {
   final AppSharedStore sharedStore;
 
   Auth _auth;
+  User get user => _auth?.user;
+
+  UserPermission _permission;
+  UserPermission get userPermission => _permission;
 
   AuthBloc({
     @required this.authRepo,
@@ -27,13 +31,14 @@ class AuthBloc extends BaseBloc<AuthEvent, AuthState> {
     mapEvent<AuthLoggedOut>(_mapLogout);
   }
 
-  void restoreLogin() {
+  Future<void> restoreLogin() async {
     if (_auth != null) {
       add(AuthRestore(_auth));
     } else {
       final token = sharedStore.token;
       final user = sharedStore.user;
       if (token != null && user != null) {
+        _permission = await userRepo.getPermission(user.id);
         add(AuthRestore(Auth(token: token, user: user)));
       }
     }
@@ -54,6 +59,7 @@ class AuthBloc extends BaseBloc<AuthEvent, AuthState> {
     await sharedStore.saveToken(auth.token);
     await sharedStore.saveUser(auth.user);
     _auth = auth;
+    _permission = await userRepo.getPermission(user.id);
     yield AuthSuccessLogin(auth);
   }
 
@@ -63,6 +69,8 @@ class AuthBloc extends BaseBloc<AuthEvent, AuthState> {
     await sharedStore.removeToken();
     await sharedStore.clearUser();
     _auth = null;
+    _permission = null;
+
     yield AuthSuccessLogout();
   }
 }

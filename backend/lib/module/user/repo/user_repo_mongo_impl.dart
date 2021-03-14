@@ -1,4 +1,5 @@
 import 'package:backend/module/user/repo/export.dart';
+import 'package:backend/config.dart';
 import 'package:sdk/domain.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:meta/meta.dart';
@@ -65,7 +66,16 @@ class UserRepoMongoImpl implements UserRepo {
         await mongo.collection("admins").findOne(where.eq("userId", userId));
 
     if (userAdminJson != null) {
-      return UserPermission.fromJson(userAdminJson);
+      final permissionId = userAdminJson["permissionId"] as String;
+      final permissionJson = await mongo
+          .collection(permissionCollection)
+          .findOne(where.eq("id", permissionId));
+      if (permissionJson != null) {
+        return UserPermission.fromJson(permissionJson);
+      } else {
+        await logError("No permission with id($permissionId) for user($userId)");
+        return UserPermission.regular();
+      }
     } else {
       return UserPermission.regular();
     }

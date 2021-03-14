@@ -17,7 +17,10 @@ class UserRepoImpl with EasyRequest implements UserRepo {
 
   @override
   Future<UserPermission> getPermission(String userId) {
-    throw UnimplementedError();
+    return request<UserPermission, Map>(
+      onResult: (json) => UserPermission.fromJson(json as Map<String, dynamic>),
+      requestProvider: () => dio.get<Map>("/user/me/permission"),
+    );
   }
 
   @override

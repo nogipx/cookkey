@@ -1,16 +1,19 @@
 import 'dart:io' show HttpHeaders;
 
 import 'package:cookkey/bloc/auth_bloc.dart';
+import 'package:cookkey/bloc/filter/filter_bloc.dart';
 import 'package:cookkey/bloc/scaffold_feedback.dart';
 import 'package:cookkey/routes.dart';
-import 'package:cookkey/page/wrapper/auth_require_wrapper.dart';
 import 'package:cookkey/page/export.dart';
 import 'package:cookkey/repo/export.dart';
 import 'package:cookkey/store/token_store.dart';
+import 'package:cookkey/wrapper/export.dart';
+import 'package:cookkey/bloc/export.dart';
 import 'package:navigation_manager/navigation_manager.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:sdk/sdk.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -40,13 +43,14 @@ class _DependencyInjectorState extends State<DependencyInjector> {
   RouteManager _routeManager;
 
   AuthBloc _authBloc;
+  FilterBloc _filterBloc;
   FeedbackBloc _feedbackBloc;
 
   Map<AppRoute, Widget Function(Map<String, dynamic>)> get appRoutes {
     return {
       CookkeyRoute.login: (_) => LoginPage(authBloc: _authBloc),
       CookkeyRoute.dashboard: (_) => DashboardPage(),
-      CookkeyRoute.search: (_) => SearchPage(),
+      CookkeyRoute.search: (_) => SearchPage(filterBloc: _filterBloc),
       CookkeyRoute.profile: (_) => ProfilePage(authBloc: _authBloc),
       CookkeyRoute.unknown: (_) => Container(color: Colors.red),
     };
@@ -70,13 +74,15 @@ class _DependencyInjectorState extends State<DependencyInjector> {
       userRepo: _userRepo,
       sharedStore: _sharedStore,
     );
+    _filterBloc = FilterBloc(tagRepo: _tagRepo);
+
+    _authBloc.restoreLogin();
 
     _routeManager = RouteManager(
       initialRoute: CookkeyRoute.dashboard,
       onUnknownRoute: (route) => CookkeyRoute.unknown,
-      mapRoute: appRoutes,
+      routes: appRoutes,
       pageWrapper: (manager, route, page) {
-        _authBloc.restoreLogin();
         return BottomNavigationWrapper(
           currentRoute: route,
           routeManager: manager,
@@ -97,19 +103,23 @@ class _DependencyInjectorState extends State<DependencyInjector> {
         print("PUSH $route, Stack Count: ${manager.pages.length}");
       },
       onRemoveRoute: (manager, route) {
-        print("REMOVE $route, Stack Count: ${manager.pages.length}");
+        print("REMOVE $route, Stack Count: ${manager.pages.length - 1}");
       },
       onDoublePushRoute: (manager, route) {
         print("DOUBLE $route, Stack Count: ${manager.pages.length}");
         return false;
       },
-      transitionDuration: const Duration(milliseconds: 500),
-      reverseTransitionDuration: const Duration(milliseconds: 300),
-      transitionProvider: (child, animation, animtation2) {
-        return FadeTransition(
-          opacity: animation,
+      onDoublePushSubRootRoute: (manager, route) {
+        print("DOUBLE SUBROOT $route, Stack Count: ${manager.pages.length}");
+        return true;
+      },
+      transitionDuration: const Duration(milliseconds: 200),
+      reverseTransitionDuration: const Duration(milliseconds: 100),
+      transitionProvider: (child, animation, animation2) {
+        return PageTransition<dynamic>(
+          type: PageTransitionType.fade,
           child: child,
-        );
+        ).buildTransitions(context, animation, animation2, child);
       },
     );
 
@@ -133,6 +143,7 @@ class _DependencyInjectorState extends State<DependencyInjector> {
         child: MultiBlocProvider(
           providers: [
             BlocProvider.value(value: _authBloc),
+            BlocProvider.value(value: _filterBloc),
             BlocProvider.value(value: _feedbackBloc),
           ],
           child: widget.child,

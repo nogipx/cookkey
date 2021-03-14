@@ -46,7 +46,7 @@ class RequestBuilder<Value, Error>
     } else if (defaultBuilder != null) {
       return defaultBuilder(context);
     } else {
-      throw "No builder provided.";
+      throw "No builder provided for state: ${state.runtimeType}";
     }
   }
 }

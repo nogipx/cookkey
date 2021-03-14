@@ -28,7 +28,7 @@ class TagRepoImpl with EasyRequest implements TagRepo {
   Future<void> deleteTagById(String tagId) {
     return request<RecipeTag, Map>(
       onResult: (json) => RecipeTag.fromJson(json as Map<String, dynamic>),
-      requestProvider: () => dio.delete<Map>("/tag/create", data: {
+      requestProvider: () => dio.delete<Map>("/tag/delete", data: {
         "tagId": tagId,
       }),
     );

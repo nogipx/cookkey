@@ -15,9 +15,13 @@ abstract class BaseBloc<Event, State> extends Bloc<Event, State>
 
   @override
   State mapErrorToState(dynamic error, StackTrace stackTrace, Event event) {
-    final _error = (error as DioError).error as ApiError;
-    logError(_error, stackTrace: stackTrace);
-    return mapError?.call(_error, event);
+    if (error is DioError) {
+      final _error = error.error as ApiError;
+      logError(_error, stackTrace: stackTrace);
+      return mapError?.call(_error, event);
+    } else {
+      throw error;
+    }
   }
 }
 

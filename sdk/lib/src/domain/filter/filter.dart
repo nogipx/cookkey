@@ -1,15 +1,20 @@
+import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sdk/sdk.dart';
+import 'package:meta/meta.dart';
 
+part 'filter.g.dart';
+
+@CopyWith()
 @JsonSerializable()
 class FilterOption extends Equatable {
   final String text;
-  final List<RecipeTag> tags;
+  final Set<RecipeTag> tags;
 
   const FilterOption({
-    this.text,
-    this.tags,
+    @required this.text,
+    @required this.tags,
   });
 
   String toQuery() {
@@ -18,7 +23,7 @@ class FilterOption extends Equatable {
       _params.add("text=$text");
     }
     if (tags != null && tags.isNotEmpty) {
-      _params.add("tags=${tags.join(',')}");
+      _params.add("tags=${tags.map((e) => e.id).join(',')}");
     }
 
     return _params.join("&");
@@ -31,7 +36,7 @@ class FilterOption extends Equatable {
     }));
     return FilterOption(
       text: _map["text"],
-      tags: _map["tags"]?.split(",")?.map((e) => RecipeTag(id: e))?.toList(),
+      tags: _map["tags"]?.split(",")?.map((e) => RecipeTag(id: e))?.toSet(),
     );
   }
 
@@ -39,8 +44,4 @@ class FilterOption extends Equatable {
 
   @override
   List<Object> get props => [toQuery()];
-
-  // factory FilterOption.fromJson(Map<String, dynamic> json) =>
-  //     _$FilterOptionFromJson(json);
-  // Map<String, dynamic> toJson() => _$FilterOptionToJson(this);
 }

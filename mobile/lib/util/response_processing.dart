@@ -24,8 +24,11 @@ mixin EasyRequest {
 
     final response = await retry<Response>(
       () => requestProvider().timeout(timeout),
-      maxAttempts: 2,
-      retryIf: (e) => isRetryAllowed && e is SocketException || e is TimeoutException,
+      maxAttempts: 8,
+      retryIf: (e) {
+        return isRetryAllowed && e is DioError && e.type == DioErrorType.DEFAULT;
+        // return isRetryAllowed && (e is SocketException || e is TimeoutException);
+      },
       onRetry: (Exception e) => onRetry?.call(),
     );
 

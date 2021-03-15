@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:convenient_bloc/request_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sdk/sdk.dart';
+import 'package:dartx/dartx.dart';
 
 class FilterWidget extends StatelessWidget {
   final FilterBloc filterBloc;
@@ -19,52 +20,95 @@ class FilterWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: RequestBuilder<List<RecipeTag>, ApiError>(
-        cubit: tagsCubit,
-        onInitial: (context, state) {
-          return Text("Data not fetched yet");
-        },
-        onSuccess: (context, state) {
-          return Column(
-            children: [
-              _buildTags(context, state),
-              ElevatedButton(
-                onPressed: () {
-                  findRecipeCubit.call();
-                  Navigator.of(context).pop();
-                },
-                child: Text("Search"),
-              )
-            ],
-          );
-        },
-        onInProgress: (context, state) {
-          return Center(child: CircularProgressIndicator());
-        },
-        onFailure: (context, state) {
-          return Text("NO DATA, ${state.error.message}");
-        },
+    return SingleChildScrollView(
+      child: Container(
+        padding: const EdgeInsets.only(top: 16, bottom: 32),
+        child: RequestBuilder<List<RecipeTag>, ApiError>(
+          cubit: tagsCubit,
+          onInitial: (context, state) {
+            return Text("Data not fetched yet");
+          },
+          onSuccess: (context, state) {
+            final Map<RecipeTagCategory, List<RecipeTag>> tagsByCategory =
+                state.result.groupBy((tag) => tag.category);
+            return Column(
+              children: [
+                _buildTags(context, tagsByCategory),
+                ElevatedButton(
+                  onPressed: () {
+                    findRecipeCubit.call();
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Search"),
+                )
+              ],
+            );
+          },
+          onInProgress: (context, state) {
+            return Center(child: CircularProgressIndicator());
+          },
+          onFailure: (context, state) {
+            return Text("NO DATA, ${state.error.message}");
+          },
+        ),
       ),
     );
   }
 
-  Widget _buildTags(BuildContext context, RequestSuccess<List<RecipeTag>> state) {
+  Widget _buildTags(BuildContext context, Map<RecipeTagCategory, List<RecipeTag>> tags) {
+    final canEdit =
+        context.read<AuthBloc>()?.userPermission?.canAccess(UserPermission.admin());
+
     return BlocBuilder<FilterBloc, FilterState>(
       builder: (context, filterState) {
-        return Wrap(
-          children: state.result.map((tag) {
-            final isSelected = filterState.filterOption.tags.contains(tag);
-            return InkWell(
-              onTap: () {
-                filterBloc.toggleTag(tag);
-              },
-              child: Chip(
-                onDeleted: isSelected ? () => filterBloc.toggleTag(tag) : null,
-                label: Text(tag.translationKey),
+        final tagsWithCategory = tags.entries.toList();
+        return ListView.builder(
+          itemCount: tagsWithCategory.length,
+          primary: false,
+          shrinkWrap: true,
+          itemBuilder: (context, index) {
+            final tags = tagsWithCategory[index];
+            final _offstage = tags.value != null && tags.value.isNotEmpty;
+            if (!_offstage) {
+              return SizedBox();
+            }
+            return Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 8,
+                horizontal: 16,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(tags.key?.translationKey ?? "Unknown category"),
+                      if (canEdit != null && canEdit)
+                        IconButton(
+                          iconSize: 20,
+                          splashRadius: 16,
+                          icon: Icon(Icons.edit_outlined),
+                          onPressed: () {},
+                        ),
+                    ],
+                  ),
+                  Wrap(
+                    spacing: 8,
+                    children: tags.value.map((tag) {
+                      final isSelected = filterState.filterOption.tags.contains(tag);
+                      return InputChip(
+                        label: Text(tag.translationKey),
+                        onDeleted: isSelected ? () => filterBloc.toggleTag(tag) : null,
+                        onPressed: () => filterBloc.toggleTag(tag),
+                      );
+                    }).toList(),
+                  )
+                ],
               ),
             );
-          }).toList(),
+          },
         );
       },
     );

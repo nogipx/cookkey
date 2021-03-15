@@ -1,5 +1,6 @@
 import 'dart:io' show HttpHeaders;
 
+import 'package:convenient_bloc/request_cubit.dart';
 import 'package:cookkey/bloc/auth_bloc.dart';
 import 'package:cookkey/bloc/filter/filter_bloc.dart';
 import 'package:cookkey/bloc/scaffold_feedback.dart';
@@ -16,6 +17,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:sdk/sdk.dart';
+import 'package:cookkey/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DependencyInjector extends StatefulWidget {
@@ -34,7 +36,7 @@ class DependencyInjector extends StatefulWidget {
   _DependencyInjectorState createState() => _DependencyInjectorState();
 }
 
-class _DependencyInjectorState extends State<DependencyInjector> {
+class _DependencyInjectorState extends State<DependencyInjector> with CookkeyApi {
   AppSharedStore _sharedStore;
   RecipeRepo _recipeRepo;
   AuthRepo _authRepo;
@@ -46,83 +48,13 @@ class _DependencyInjectorState extends State<DependencyInjector> {
   FilterBloc _filterBloc;
   FeedbackBloc _feedbackBloc;
 
-  Map<AppRoute, Widget Function(Map<String, dynamic>)> get appRoutes {
-    return {
-      CookkeyRoute.login: (_) => LoginPage(authBloc: _authBloc),
-      CookkeyRoute.dashboard: (_) => DashboardPage(),
-      CookkeyRoute.search: (_) => SearchPage(filterBloc: _filterBloc),
-      CookkeyRoute.profile: (_) => ProfilePage(authBloc: _authBloc),
-      CookkeyRoute.unknown: (_) => Container(color: Colors.red),
-    };
-  }
+  RequestCubit<List<RecipeTag>, ApiError> _tagsCubit;
 
   @override
   void initState() {
-    _sharedStore = AppSharedStore(widget.sharedPreferences);
-
-    final dio = Dio(BaseOptions(baseUrl: widget.server.toString()));
-    dio.interceptors.add(getDioInterceptor(() => _sharedStore.token));
-
-    _recipeRepo = RecipeRepoImpl(dio: dio);
-    _authRepo = AuthRepo(dio: dio);
-    _userRepo = UserRepoImpl(dio: dio);
-    _tagRepo = TagRepoImpl(dio: dio);
-
-    _feedbackBloc = FeedbackBloc();
-    _authBloc = AuthBloc(
-      authRepo: _authRepo,
-      userRepo: _userRepo,
-      sharedStore: _sharedStore,
-    );
-    _filterBloc = FilterBloc(tagRepo: _tagRepo);
-
+    setupInjection();
+    _routeManager = getRouteManager();
     _authBloc.restoreLogin();
-
-    _routeManager = RouteManager(
-      initialRoute: CookkeyRoute.dashboard,
-      onUnknownRoute: (route) => CookkeyRoute.unknown,
-      routes: appRoutes,
-      pageWrapper: (manager, route, page) {
-        return BottomNavigationWrapper(
-          currentRoute: route,
-          routeManager: manager,
-          bottomNavigationRoutes: [
-            CookkeyRoute.search,
-            CookkeyRoute.dashboard,
-            CookkeyRoute.profile,
-            CookkeyRoute.unknown,
-          ],
-          child: AuthRequireWrapper(
-            currentRoute: route,
-            authRoutes: [CookkeyRoute.profile],
-            child: page,
-          ),
-        );
-      },
-      onPushRoute: (manager, route) {
-        print("PUSH $route, Stack Count: ${manager.pages.length}");
-      },
-      onRemoveRoute: (manager, route) {
-        print("REMOVE $route, Stack Count: ${manager.pages.length - 1}");
-      },
-      onDoublePushRoute: (manager, route) {
-        print("DOUBLE $route, Stack Count: ${manager.pages.length}");
-        return false;
-      },
-      onDoublePushSubRootRoute: (manager, route) {
-        print("DOUBLE SUBROOT $route, Stack Count: ${manager.pages.length}");
-        return true;
-      },
-      transitionDuration: const Duration(milliseconds: 200),
-      reverseTransitionDuration: const Duration(milliseconds: 100),
-      transitionProvider: (child, animation, animation2) {
-        return PageTransition<dynamic>(
-          type: PageTransitionType.fade,
-          child: child,
-        ).buildTransitions(context, animation, animation2, child);
-      },
-    );
-
     super.initState();
   }
 
@@ -151,6 +83,89 @@ class _DependencyInjectorState extends State<DependencyInjector> {
       ),
     );
   }
+
+  // Injection Setup
+  void setupInjection() {
+    final dio = Dio(BaseOptions(baseUrl: widget.server.toString()));
+    dio.interceptors.add(getDioInterceptor(() => _sharedStore.token));
+
+    _sharedStore = AppSharedStore(widget.sharedPreferences);
+
+    _recipeRepo = RecipeRepoImpl(dio: dio);
+    _authRepo = AuthRepo(dio: dio);
+    _userRepo = UserRepoImpl(dio: dio);
+    _tagRepo = TagRepoImpl(dio: dio);
+
+    _feedbackBloc = FeedbackBloc();
+    _authBloc = AuthBloc(
+      authRepo: _authRepo,
+      userRepo: _userRepo,
+      sharedStore: _sharedStore,
+    );
+    _filterBloc = FilterBloc(tagRepo: _tagRepo);
+
+    _tagsCubit = getAllRecipeTags(context, _tagRepo);
+  }
+
+  // Routing Setup
+
+  Map<AppRoute, Widget Function(Map<String, dynamic>)> get appRoutes {
+    return {
+      CookkeyRoute.login: (_) => LoginPage(authBloc: _authBloc),
+      CookkeyRoute.dashboard: (_) => DashboardPage(),
+      CookkeyRoute.search: (_) =>
+          SearchPage(filterBloc: _filterBloc, tagsCubit: _tagsCubit),
+      CookkeyRoute.profile: (_) => ProfilePage(authBloc: _authBloc),
+      CookkeyRoute.unknown: (_) => Container(color: Colors.red),
+    };
+  }
+
+  RouteManager getRouteManager() {
+    return RouteManager(
+      initialRoute: CookkeyRoute.dashboard,
+      onUnknownRoute: (route) => CookkeyRoute.unknown,
+      routes: appRoutes,
+      pageWrapper: (manager, route, page) {
+        return BottomNavigationWrapper(
+          currentRoute: route,
+          routeManager: manager,
+          bottomNavigationRoutes: CookkeyRoute.withBottomNavigation,
+          child: AuthRequireWrapper(
+            currentRoute: route,
+            authRoutes: CookkeyRoute.authRequired,
+            child: page,
+          ),
+        );
+      },
+      onPushRoute: (manager, route) {
+        print("PUSH $route, Stack Count: ${manager.pages.length}");
+      },
+      onRemoveRoute: (manager, route) {
+        print("REMOVE $route, Stack Count: ${manager.pages.length - 1}");
+      },
+      onDoublePushRoute: (manager, route) {
+        print("DOUBLE $route, Stack Count: ${manager.pages.length}");
+        return false;
+      },
+      onDoublePushSubRootRoute: (manager, route) {
+        print("DOUBLE SUBROOT $route, Stack Count: ${manager.pages.length}");
+        if (route == CookkeyRoute.search) {
+          _tagsCubit.call();
+        }
+        return true;
+      },
+      transitionDuration: const Duration(milliseconds: 200),
+      reverseTransitionDuration: const Duration(milliseconds: 100),
+      transitionProvider: (child, animation, animation2) {
+        return PageTransition<dynamic>(
+          type: PageTransitionType.fade,
+          child: child,
+        ).buildTransitions(context, animation, animation2, child);
+      },
+    );
+  }
+
+  // Network Setup
 
   Interceptor getDioInterceptor(String Function() tokenProvider) {
     return InterceptorsWrapper(

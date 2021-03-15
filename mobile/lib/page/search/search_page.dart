@@ -1,17 +1,17 @@
 import 'package:convenient_bloc/request_cubit.dart';
 import 'package:cookkey/api.dart';
+import 'package:sdk/domain.dart';
 import 'package:cookkey/bloc/export.dart';
 import 'package:cookkey/page/export.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sdk/domain.dart';
 
 class SearchPage extends StatefulWidget with CookkeyApi {
   final FilterBloc filterBloc;
-
+  final RequestCubit<List<RecipeTag>, ApiError> tagsCubit;
   SearchPage({
     Key key,
     @required this.filterBloc,
+    @required this.tagsCubit,
   }) : super(key: key);
 
   @override
@@ -26,6 +26,7 @@ class _SearchPageState extends State<SearchPage> with CookkeyApi {
   @override
   void initState() {
     _filterRecipesCubit = getRecipesByFilter(context: context);
+    widget.tagsCubit.call();
     super.initState();
   }
 
@@ -38,9 +39,10 @@ class _SearchPageState extends State<SearchPage> with CookkeyApi {
         onPressed: () async {
           await showModalBottomSheet<dynamic>(
             context: context,
+            isScrollControlled: true,
             builder: (context) => FilterWidget(
               filterBloc: widget.filterBloc,
-              tagsCubit: getAllRecipeTags(context)..call(),
+              tagsCubit: widget.tagsCubit,
               findRecipeCubit: _filterRecipesCubit,
             ),
           );

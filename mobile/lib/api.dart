@@ -7,9 +7,10 @@ import 'package:provider/provider.dart';
 import 'package:sdk/repo.dart';
 
 mixin CookkeyApi {
-  RequestCubit<List<RecipeTag>, ApiError> getAllRecipeTags(BuildContext context) {
+  RequestCubit<List<RecipeTag>, ApiError> getAllRecipeTags(
+      BuildContext context, TagRepo tagRepo) {
     return RequestCubit(
-      () => context.read<TagRepo>().getAllTags(),
+      () => tagRepo.getAllTags(),
       onRequestError: (error) {
         ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.error(error.message));
       },

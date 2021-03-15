@@ -8,4 +8,6 @@ extension CookkeyRoute on AppRoute {
   static final login = AppRoute("/login");
 
   static final routes = [dashboard, search, unknown];
+  static final withBottomNavigation = [search, dashboard, profile, unknown];
+  static final authRequired = [profile];
 }

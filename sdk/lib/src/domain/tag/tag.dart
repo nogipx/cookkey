@@ -31,7 +31,7 @@ class RecipeTag extends Equatable {
   }) : assert(id != null);
 
   @override
-  List<Object> get props => [id, category, translationKey, isVisible];
+  List<Object> get props => [id];
 
   @override
   String toString() => "Tag [$category : $translationKey]";

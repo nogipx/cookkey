@@ -6,6 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sdk/sdk.dart';
 import 'package:dartx/dartx.dart';
 
+import 'export.dart';
+
 class FilterWidget extends StatelessWidget {
   final FilterBloc filterBloc;
   final RequestCubit<List<RecipeTag>, ApiError> tagsCubit;
@@ -98,10 +100,13 @@ class FilterWidget extends StatelessWidget {
                     spacing: 8,
                     children: tags.value.map((tag) {
                       final isSelected = filterState.filterOption.tags.contains(tag);
-                      return InputChip(
-                        label: Text(tag.translationKey),
-                        onDeleted: isSelected ? () => filterBloc.toggleTag(tag) : null,
-                        onPressed: () => filterBloc.toggleTag(tag),
+                      return TagEditMiddleware(
+                        hasEditPermission: canEdit,
+                        child: InputChip(
+                          label: Text(tag.translationKey),
+                          onDeleted: isSelected ? () => filterBloc.toggleTag(tag) : null,
+                          onPressed: () => filterBloc.toggleTag(tag),
+                        ),
                       );
                     }).toList(),
                   )

@@ -9,12 +9,15 @@ class FilterBloc extends BaseBloc<FilterEvent, FilterState> {
 
   static FilterOption get emptyFilter => FilterOption(text: "", tags: {});
 
-  final FilterOption _filterOption = FilterBloc.emptyFilter;
+  FilterOption _filterOption = FilterBloc.emptyFilter;
   FilterOption get filterOption => _filterOption;
 
   FilterBloc({
     @required this.tagRepo,
-  }) : super(FilterInitial(FilterBloc.emptyFilter));
+    FilterOption initialFilter,
+  }) : super(FilterInitial(initialFilter ?? FilterBloc.emptyFilter)) {
+    _filterOption = initialFilter ?? emptyFilter;
+  }
 
   @override
   FilterState mapError(ApiError error, FilterEvent event) {

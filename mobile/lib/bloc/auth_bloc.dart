@@ -12,7 +12,7 @@ class AuthBloc extends BaseBloc<AuthEvent, AuthState> {
   Auth _auth;
   User get user => _auth?.user;
 
-  UserPermission _permission;
+  UserPermission _permission = UserPermission.regular();
   UserPermission get userPermission => _permission;
 
   AuthBloc({
@@ -38,8 +38,8 @@ class AuthBloc extends BaseBloc<AuthEvent, AuthState> {
       final token = sharedStore.token;
       final user = sharedStore.user;
       if (token != null && user != null) {
-        _permission = await userRepo.getPermission(user.id);
         add(AuthRestore(Auth(token: token, user: user)));
+        _permission = await userRepo.getPermission(user.id) ?? UserPermission.regular();
       }
     }
   }

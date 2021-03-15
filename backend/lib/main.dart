@@ -65,7 +65,10 @@ Future<Angel> createServer({Logger logger}) async {
 
   final authController = AuthController(auth: auth);
   final userController = UserController(userRepo: userRepo);
-  final tagCategoryController = TagCategoryController(tagCategoryRepo: tagCategoryRepo);
+  final tagCategoryController = TagCategoryController(
+    tagCategoryRepo: tagCategoryRepo,
+    tagRepo: tagRepo,
+  );
   final tagController = TagController(
     tagRepo: tagRepo,
     tagCategoryRepo: tagCategoryRepo,

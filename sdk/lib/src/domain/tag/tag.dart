@@ -10,7 +10,7 @@ part 'tag.g.dart';
 
 /// Tags are received from backend.
 /// It will be used for categorize and filter receipts.
-@CopyWith()
+@CopyWith(generateCopyWithNull: true)
 @JsonSerializable(explicitToJson: true)
 class RecipeTag extends Equatable {
   final String id;

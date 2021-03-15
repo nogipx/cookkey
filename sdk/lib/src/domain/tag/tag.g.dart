@@ -20,6 +20,20 @@ extension RecipeTagCopyWith on RecipeTag {
       translationKey: translationKey ?? this.translationKey,
     );
   }
+
+  RecipeTag copyWithNull({
+    bool category = false,
+    bool id = false,
+    bool isVisible = false,
+    bool translationKey = false,
+  }) {
+    return RecipeTag(
+      category: category == true ? null : this.category,
+      id: id == true ? null : this.id,
+      isVisible: isVisible == true ? null : this.isVisible,
+      translationKey: translationKey == true ? null : this.translationKey,
+    );
+  }
 }
 
 // **************************************************************************

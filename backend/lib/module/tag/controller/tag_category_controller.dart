@@ -1,4 +1,5 @@
 import 'package:angel_framework/angel_framework.dart';
+import 'package:backend/util/log.dart';
 import 'package:backend/util/permission.dart';
 import 'package:meta/meta.dart';
 import 'package:sdk/sdk.dart';
@@ -7,9 +8,11 @@ import 'package:uuid/uuid.dart';
 @Expose("/tag/category")
 class TagCategoryController extends Controller {
   final TagCategoryRepo tagCategoryRepo;
+  final TagRepo tagRepo;
 
   TagCategoryController({
     @required this.tagCategoryRepo,
+    @required this.tagRepo,
   });
 
   @Expose("/create", method: "POST")
@@ -46,7 +49,16 @@ class TagCategoryController extends Controller {
         ...result.data,
         "id": originCategory.id,
       });
-      return await tagCategoryRepo.updateCategory(category);
+      final linkedTags = await tagRepo.getTagsByCategoryId(category.id);
+      final updatedTags = linkedTags.map((e) => e.copyWith(category: category));
+      await tagCategoryRepo.updateCategory(category);
+      await Future.forEach<RecipeTag>(updatedTags, (tag) async {
+        await tagRepo.updateTag(tag);
+      }).onError((dynamic error, stackTrace) {
+        logError("Error while updating "
+            "category(${category.id}, ${category.translationKey})"
+            ": $error");
+      });
     } else {
       throw ApiError.notProcessable(
         message: "Invalid tag input data.",
@@ -62,7 +74,16 @@ class TagCategoryController extends Controller {
     await req.parseBody();
     final categoryId = req.bodyAsMap["categoryId"] as String;
     final category = await tagCategoryRepo.getCategoryById(categoryId);
+    final linkedTags = await tagRepo.getTagsByCategoryId(category.id);
+    final updatedTags = linkedTags.map((e) => e.copyWithNull(category: true));
     await tagCategoryRepo.deleteCategoryById(category.id);
+    await Future.forEach<RecipeTag>(updatedTags, (tag) async {
+      await tagRepo.updateTag(tag);
+    }).onError((dynamic error, stackTrace) {
+      logError("Error while deleting "
+          "category(${category.id}, ${category.translationKey})"
+          ": $error");
+    });
     return category;
   }
 

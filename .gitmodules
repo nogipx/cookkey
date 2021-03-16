@@ -1,0 +1,3 @@
+[submodule "convenient_bloc"]
+	path = convenient_bloc
+	url = git@gitlab.com:nogipx/convenient_bloc

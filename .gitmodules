@@ -1,0 +1,6 @@
+[submodule "packages/navigation_manager"]
+	path = packages/navigation_manager
+	url = git@gitlab.com:nogipx/navigation_manager
+[submodule "packages/convenient_bloc"]
+	path = packages/convenient_bloc
+	url = git@gitlab.com:nogipx/convenient_bloc

@@ -477,7 +477,7 @@ packages:
       path: "../packages/navigation_manager"
       relative: true
     source: path
-    version: "0.0.3"
+    version: "0.0.9"
   nested:
     dependency: transitive
     description:

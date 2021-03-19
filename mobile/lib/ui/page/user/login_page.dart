@@ -1,11 +1,8 @@
 import 'dart:async';
 
 import 'package:cookkey/bloc/auth_bloc.dart';
-import 'package:cookkey/bloc/scaffold_feedback.dart';
-import 'package:cookkey/widget/password_field.dart';
-import 'package:cookkey/widget/snackbars.dart';
+import 'package:cookkey/ui/export.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginPage extends StatefulWidget {
   final AuthBloc authBloc;
@@ -24,18 +21,11 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController _username;
   TextEditingController _password;
   StreamSubscription _feedback;
-  FeedbackBloc _feedbackBloc;
 
   @override
   void initState() {
     _username = TextEditingController();
     _password = TextEditingController();
-    _feedbackBloc = context.read<FeedbackBloc>();
-    _feedback = widget.authBloc.listen((state) {
-      if (state is AuthFailure) {
-        _feedbackBloc.push<LoginPage>(state.error.message);
-      }
-    });
     super.initState();
   }
 

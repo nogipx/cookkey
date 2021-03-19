@@ -1,14 +1,10 @@
 import 'dart:io' show HttpHeaders;
 
 import 'package:convenient_bloc/request_cubit.dart';
-import 'package:cookkey/bloc/auth_bloc.dart';
-import 'package:cookkey/bloc/filter/filter_bloc.dart';
-import 'package:cookkey/bloc/scaffold_feedback.dart';
 import 'package:cookkey/routes.dart';
-import 'package:cookkey/page/export.dart';
+import 'package:cookkey/ui/export.dart';
 import 'package:cookkey/repo/export.dart';
 import 'package:cookkey/store/token_store.dart';
-import 'package:cookkey/wrapper/export.dart';
 import 'package:cookkey/bloc/export.dart';
 import 'package:navigation_manager/navigation_manager.dart';
 import 'package:dio/dio.dart';
@@ -46,7 +42,6 @@ class _DependencyInjectorState extends State<DependencyInjector> with CookkeyApi
 
   AuthBloc _authBloc;
   FilterBloc _filterBloc;
-  FeedbackBloc _feedbackBloc;
 
   RequestCubit<List<RecipeTag>, ApiError> _tagsCubit;
 
@@ -76,7 +71,7 @@ class _DependencyInjectorState extends State<DependencyInjector> with CookkeyApi
           providers: [
             BlocProvider.value(value: _authBloc),
             BlocProvider.value(value: _filterBloc),
-            BlocProvider.value(value: _feedbackBloc),
+            BlocProvider.value(value: _tagsCubit)
           ],
           child: widget.child,
         ),
@@ -96,7 +91,6 @@ class _DependencyInjectorState extends State<DependencyInjector> with CookkeyApi
     _userRepo = UserRepoImpl(dio: dio);
     _tagRepo = TagRepoImpl(dio: dio);
 
-    _feedbackBloc = FeedbackBloc();
     _authBloc = AuthBloc(
       authRepo: _authRepo,
       userRepo: _userRepo,
@@ -107,25 +101,13 @@ class _DependencyInjectorState extends State<DependencyInjector> with CookkeyApi
     _tagsCubit = getAllRecipeTags(context, _tagRepo);
   }
 
-  // Routing Setup
-
-  Map<AppRoute, Widget Function(Map<String, dynamic>)> get appRoutes {
-    return {
-      CookkeyRoute.login: (_) => LoginPage(authBloc: _authBloc),
-      CookkeyRoute.dashboard: (_) => DashboardPage(),
-      CookkeyRoute.search: (_) =>
-          SearchPage(filterBloc: _filterBloc, tagsCubit: _tagsCubit),
-      CookkeyRoute.profile: (_) => ProfilePage(authBloc: _authBloc),
-      CookkeyRoute.unknown: (_) => Container(color: Colors.red),
-    };
-  }
-
+  // Routing Setups
   RouteManager getRouteManager() {
     return RouteManager(
+      debugging: true,
       initialRoute: CookkeyRoute.dashboard,
       onUnknownRoute: (route) => CookkeyRoute.unknown,
-      routes: appRoutes,
-      pageWrapper: (manager, route, page) {
+      pageWrapper: (RouteManager manager, AppRoute route, Widget page) {
         return BottomNavigationWrapper(
           currentRoute: route,
           routeManager: manager,
@@ -138,10 +120,10 @@ class _DependencyInjectorState extends State<DependencyInjector> with CookkeyApi
         );
       },
       onPushRoute: (manager, route) {
-        print("PUSH $route, Stack Count: ${manager.pages.length}");
+        print("PUSH $route, Stack Count: ${manager.pages}");
       },
       onRemoveRoute: (manager, route) {
-        print("REMOVE $route, Stack Count: ${manager.pages.length - 1}");
+        print("REMOVE $route, Stack Count: ${manager.pages}");
       },
       onDoublePushRoute: (manager, route) {
         print("DOUBLE $route, Stack Count: ${manager.pages.length}");

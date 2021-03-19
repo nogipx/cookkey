@@ -1,17 +1,14 @@
 import 'package:convenient_bloc/request_cubit.dart';
 import 'package:cookkey/api.dart';
+import 'package:cookkey/ui/export.dart';
 import 'package:sdk/domain.dart';
 import 'package:cookkey/bloc/export.dart';
-import 'package:cookkey/page/export.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SearchPage extends StatefulWidget with CookkeyApi {
-  final FilterBloc filterBloc;
-  final RequestCubit<List<RecipeTag>, ApiError> tagsCubit;
   SearchPage({
     Key key,
-    @required this.filterBloc,
-    @required this.tagsCubit,
   }) : super(key: key);
 
   @override
@@ -21,12 +18,16 @@ class SearchPage extends StatefulWidget with CookkeyApi {
 class _SearchPageState extends State<SearchPage> with CookkeyApi {
   final GlobalKey<ScaffoldState> _scaffold = GlobalKey();
 
+  FilterBloc _filterBloc;
+  RequestCubit<List<RecipeTag>, ApiError> _tagsCubit;
   RequestCubit<List<Recipe>, ApiError> _filterRecipesCubit;
 
   @override
   void initState() {
+    _filterBloc = context.read<FilterBloc>();
+    _tagsCubit = context.read<RequestCubit<List<RecipeTag>, ApiError>>();
     _filterRecipesCubit = getRecipesByFilter(context: context);
-    widget.tagsCubit.call();
+    _tagsCubit.call();
     super.initState();
   }
 
@@ -41,8 +42,8 @@ class _SearchPageState extends State<SearchPage> with CookkeyApi {
             context: context,
             isScrollControlled: true,
             builder: (context) => FilterWidget(
-              filterBloc: widget.filterBloc,
-              tagsCubit: widget.tagsCubit,
+              filterBloc: _filterBloc,
+              tagsCubit: _tagsCubit,
               findRecipeCubit: _filterRecipesCubit,
             ),
           );

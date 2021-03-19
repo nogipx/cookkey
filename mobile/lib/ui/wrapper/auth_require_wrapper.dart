@@ -1,5 +1,5 @@
-import 'package:cookkey/bloc/auth_bloc.dart';
-import 'package:cookkey/page/export.dart';
+import 'package:cookkey/bloc/export.dart';
+import 'package:cookkey/ui/export.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:navigation_manager/navigation_manager.dart';

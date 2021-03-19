@@ -1,6 +1,4 @@
-import 'package:cookkey/bloc/base_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:navigation_manager/navigation_manager.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({Key key}) : super(key: key);

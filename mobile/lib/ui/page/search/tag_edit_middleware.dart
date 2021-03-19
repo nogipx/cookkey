@@ -20,23 +20,27 @@ class TagEditMiddleware extends StatelessWidget {
         await showDialog<void>(
           context: context,
           builder: (context) {
-            return Center(
-              child: Container(
-                color: Colors.white,
-                width: MediaQuery.of(context).size.width * 0.75,
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TextButton.icon(
-                      onPressed: () {},
-                      icon: Icon(Icons.edit_outlined),
-                      label: Text("Edit"),
-                    )
-                  ],
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  color: Colors.white,
+                  width: MediaQuery.of(context).size.width * 0.75,
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextButton.icon(
+                        onPressed: () {},
+                        icon: Icon(Icons.edit_outlined),
+                        label: Text("Edit"),
+                      )
+                    ],
+                  ),
                 ),
-              ),
+              ],
             );
           },
         );

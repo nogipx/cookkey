@@ -41,10 +41,22 @@ class _SearchPageState extends State<SearchPage> with CookkeyApi {
           await showModalBottomSheet<dynamic>(
             context: context,
             isScrollControlled: true,
-            builder: (context) => FilterWidget(
-              filterBloc: _filterBloc,
-              tagsCubit: _tagsCubit,
-              findRecipeCubit: _filterRecipesCubit,
+            builder: (context) => Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TagsCollectionWidget(
+                  authBloc: context.read<AuthBloc>(),
+                  filterBloc: _filterBloc,
+                  tagsCubit: _tagsCubit,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    _filterRecipesCubit.call();
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Search"),
+                )
+              ],
             ),
           );
         },

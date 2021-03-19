@@ -10,25 +10,30 @@ dependencies:
   flutter:
     sdk: flutter
   
+  sdk:
+    path: ../sdk
+
+  # UI
+  cupertino_icons: ^1.0.2
+  styled_widget: ^0.2.2
+  page_transition: "^1.1.7+6"
+  navigation_manager:
+    path: ../packages/navigation_manager
+
+  # Utils
+  fluttertoast: ^7.1.8
+  shared_preferences: ^0.5.12+4
+  
+  # Data management
+  dartx: ^0.5.0
   bloc: ^6.1.3
   flutter_bloc: ^6.1.3
   provider: ^4.3.3
   rxdart: ^0.26.0
-  fluttertoast: ^7.1.8
-  uri: ^0.11.4
-  dartx: ^0.5.0
-
-  page_transition: "^1.1.7+6"
   convenient_bloc:
     path: ../packages/convenient_bloc
-  navigation_manager:
-    path: ../packages/navigation_manager
-  sdk:
-    path: ../sdk
-  cupertino_icons: ^1.0.2
 
-  shared_preferences: ^0.5.12+4
-
+  # Data
   uuid: ^2.2.0
   equatable: ^1.0.0
   json_annotation: ^3.1.0

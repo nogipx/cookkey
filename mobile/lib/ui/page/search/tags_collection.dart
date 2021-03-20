@@ -1,6 +1,6 @@
 import 'package:cookkey/bloc/export.dart';
 import 'package:cookkey/ui/export.dart';
-import 'package:cookkey/ui/widget/two_column_layout.dart';
+import 'package:cookkey/ui/widget/layout/two_column_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:convenient_bloc/request_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,12 +9,12 @@ import 'package:dartx/dartx.dart';
 
 class TagsCollectionWidget extends StatelessWidget {
   final FilterBloc filterBloc;
-  final AuthBloc authBloc;
+  final UserPermission userPermission;
   final RequestCubit<List<RecipeTag>, ApiError> tagsCubit;
 
   const TagsCollectionWidget({
     Key key,
-    @required this.authBloc,
+    @required this.userPermission,
     @required this.filterBloc,
     @required this.tagsCubit,
   }) : super(key: key);
@@ -32,7 +32,7 @@ class TagsCollectionWidget extends StatelessWidget {
           onSuccess: (context, state) {
             final tagsByCategory =
                 state.result.groupBy((tag) => tag.category).entries.toList();
-            final canEdit = authBloc.userPermission.canAccess(UserPermission.admin());
+            final canEdit = userPermission.canAccess(UserPermission.admin());
             return BlocBuilder<FilterBloc, FilterState>(
               builder: (context, state) {
                 return ListView.builder(

@@ -1,3 +1,4 @@
+import 'package:cookkey/color.dart';
 import 'package:cookkey/routes.dart';
 import 'package:navigation_manager/navigation_manager.dart';
 import 'package:flutter/material.dart';
@@ -14,13 +15,16 @@ class CookkeyMobileApp extends StatelessWidget {
       builder: (context, manager, child) {
         return MaterialApp.router(
           title: 'Flutter Demo',
+          debugShowCheckedModeBanner: false,
           theme: ThemeData(
-            primarySwatch: Colors.blue,
+            primarySwatch: Colors.green,
+            backgroundColor: CookkeyColor.background,
+            scaffoldBackgroundColor: CookkeyColor.background,
           ),
           routeInformationParser: AppRouteInformationParser(
             routes: CookkeyRoute.routes,
             debugging: true,
-            initialRoute: CookkeyRoute.dashboard,
+            initialRoute: CookkeyRoute.search,
             unknownRoute: CookkeyRoute.unknown,
             transformUri: (uri) {
               if (uri.pathSegments.isNotEmpty && uri.pathSegments.first == "m") {

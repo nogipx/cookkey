@@ -35,33 +35,6 @@ class _SearchPageState extends State<SearchPage> with CookkeyApi {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffold,
-      appBar: AppBar(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await showModalBottomSheet<dynamic>(
-            context: context,
-            isScrollControlled: true,
-            builder: (context) => Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TagsCollectionWidget(
-                  authBloc: context.read<AuthBloc>(),
-                  filterBloc: _filterBloc,
-                  tagsCubit: _tagsCubit,
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    _filterRecipesCubit.call();
-                    Navigator.of(context).pop();
-                  },
-                  child: Text("Search"),
-                )
-              ],
-            ),
-          );
-        },
-        child: Icon(Icons.filter_alt_rounded),
-      ),
       body: RequestBuilder<List<Recipe>, ApiError>(
         cubit: _filterRecipesCubit,
         onInitial: (_, __) => SizedBox(),

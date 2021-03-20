@@ -1,11 +1,12 @@
 import 'package:cookkey/ui/export.dart';
+import 'package:flutter/material.dart';
 import 'package:navigation_manager/navigation_manager.dart';
 
 extension CookkeyRoute on AppRoute {
   static final dashboard =
       AppRoute<SearchPageArgs>.subroot("/dashboard", (t) => DashboardPage());
   static final search = AppRoute.subroot("/search{/query}", (_) => SearchPage());
-  static final profile = AppRoute.subroot("/profile", (_) => null);
+  static final profile = AppRoute.subroot("/profile", (_) => Scaffold());
   static final unknown = AppRoute("/404", (_) => null);
   static final login = AppRoute("/login", (_) => null);
 

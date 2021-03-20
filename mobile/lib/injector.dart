@@ -6,6 +6,7 @@ import 'package:cookkey/ui/export.dart';
 import 'package:cookkey/repo/export.dart';
 import 'package:cookkey/store/token_store.dart';
 import 'package:cookkey/bloc/export.dart';
+import 'package:cookkey/ui/wrapper/search/search_wrapper.dart';
 import 'package:navigation_manager/navigation_manager.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -105,17 +106,26 @@ class _DependencyInjectorState extends State<DependencyInjector> with CookkeyApi
   RouteManager getRouteManager() {
     return RouteManager(
       debugging: true,
-      initialRoute: CookkeyRoute.dashboard,
+      initialRoute: CookkeyRoute.search,
       onUnknownRoute: (route) => CookkeyRoute.unknown,
       pageWrapper: (RouteManager manager, AppRoute route, Widget page) {
-        return BottomNavigationWrapper(
+        return AuthRequireWrapper(
           currentRoute: route,
-          routeManager: manager,
-          bottomNavigationRoutes: CookkeyRoute.withBottomNavigation,
-          child: AuthRequireWrapper(
+          authRoutes: CookkeyRoute.authRequired,
+          child: SearchWrapper(
             currentRoute: route,
-            authRoutes: CookkeyRoute.authRequired,
-            child: page,
+            routeManager: manager,
+            searchRoutes: [CookkeyRoute.search],
+            child: Consumer<RouteManager>(
+              builder: (context, manager, _) {
+                return BottomNavigationWrapper(
+                  currentRoute: route,
+                  routeManager: manager,
+                  bottomNavigationRoutes: CookkeyRoute.withBottomNavigation,
+                  child: page,
+                );
+              },
+            ),
           ),
         );
       },

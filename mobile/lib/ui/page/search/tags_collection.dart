@@ -1,5 +1,6 @@
 import 'package:cookkey/bloc/export.dart';
 import 'package:cookkey/ui/export.dart';
+import 'package:cookkey/ui/widget/two_column_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:convenient_bloc/request_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -39,13 +40,28 @@ class TagsCollectionWidget extends StatelessWidget {
                   itemCount: tagsByCategory.length,
                   itemBuilder: (context, index) {
                     final category = tagsByCategory[index];
-                    return TagsCategoryAtom(
-                      canEdit: canEdit,
-                      activeTags: filterBloc.filterOption.tags,
-                      category: category.key,
-                      tags: category.value,
-                      onDeleteTag: (tag) => filterBloc.toggleTag(tag),
-                      onTapTag: (tag) => filterBloc.toggleTag(tag),
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TagsCategoryAtom(
+                          canEdit: canEdit,
+                          category: category.key,
+                        ),
+                        ColumnsLayout<RecipeTag>(
+                          columns: 3,
+                          items: category.value,
+                          itemBuilder: (tag) => TagEditMiddleware(
+                            hasEditPermission: canEdit,
+                            child: TagChipAtom(
+                              tag: tag,
+                              onPressed: (_) => filterBloc.toggleTag(tag),
+                              onDeleted: filterBloc.isTagSelected(tag)
+                                  ? filterBloc.toggleTag
+                                  : null,
+                            ),
+                          ),
+                        )
+                      ],
                     );
                   },
                 );

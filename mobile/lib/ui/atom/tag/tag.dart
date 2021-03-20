@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:sdk/sdk.dart';
 
-class TagAtom extends StatelessWidget {
+class TagChipAtom extends StatelessWidget {
   final RecipeTag tag;
   final Function(RecipeTag tag) onDeleted;
   final Function(RecipeTag tag) onPressed;
 
-  const TagAtom({
+  const TagChipAtom({
     Key key,
     @required this.tag,
     this.onDeleted,
